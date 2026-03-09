@@ -15,6 +15,9 @@
            DYNAMIC THEME ENGINE
            ========================================= */
 
+        /* CRITICAL SAFETY STYLES */
+        [id$="Modal"], #bottomSheet { display: none; }
+
         /* --- THEME 1: DARK AMBIENT (Default) --- */
         body.theme-dark {
             background-color: #050508;
@@ -515,7 +518,7 @@
                         <!-- Default state -->
                         <div class="h-full flex flex-col items-center justify-center text-white/40 space-y-4 pt-20 cursor-pointer group hover:text-white/80 transition-colors" onclick="document.getElementById('addFilesBtn').click()">
                             <i data-lucide="folder-search" class="w-16 h-16 opacity-40 group-hover:opacity-100 transition-opacity"></i>
-                            <p class="italic text-center font-medium text-lg">Your library is currently empty.<br>Click here to select specific songs, or drag and drop files here.</p>
+                            <p class="italic text-center font-medium text-lg tracking-wide">Your library is currently empty.<br>Click here to select specific songs, or drag and drop files here.</p>
                         </div>
                     </div>
                 </div>
@@ -850,8 +853,13 @@
         
         function saveToDisk() {
             if (window.electronAPI) {
+                // Ensure we strip the raw File object before sending over IPC to avoid crashing Electron
+                const cleanSongs = songs.map(s => {
+                    const { file, ...rest } = s;
+                    return rest;
+                });
                 window.electronAPI.saveData({
-                    songs: songs,
+                    songs: cleanSongs,
                     playlists: playlists
                 });
             }
@@ -880,14 +888,20 @@
         // Modals Helpers
         function showModal(id) {
             const m = document.getElementById(id);
+            m.style.display = 'flex';
             m.classList.remove('hidden');
             setTimeout(() => m.classList.replace('opacity-0', 'opacity-100'), 10);
         }
         function hideModals() {
             document.querySelectorAll('.fixed.z-\\[60\\]').forEach(m => {
                 m.classList.replace('opacity-100', 'opacity-0');
-                setTimeout(() => m.classList.add('hidden'), 300);
+                setTimeout(() => { m.style.display = 'none'; m.classList.add('hidden'); }, 300);
             });
+            // Ensure bottom sheet hides correctly too
+            const sheet = document.getElementById('bottomSheet');
+            if (sheet && !sheet.classList.contains('hidden')) {
+                closeMenu();
+            }
         }
         document.querySelectorAll('.close-modal-btn').forEach(btn => btn.onclick = hideModals);
 
@@ -942,14 +956,15 @@
             
             files.forEach(async f => {
                 const filePath = f.path || "";
-                if (songs.find(s => s.path === filePath)) return; 
+                // Check for duplicates by path OR by title (crucial for web uploads where path is fake)
+                if (songs.find(s => (s.path === filePath && filePath !== "") || s.title === f.name.replace(/\.[^/.]+$/, ""))) return; 
 
                 const songId = Math.random().toString(36).substr(2, 9);
                 const song = { 
                     id: songId, path: filePath, 
                     title: f.name.replace(/\.[^/.]+$/, ""), 
                     artist: 'Unknown Artist', 
-                    fav: false, cover: null 
+                    fav: false, cover: null, file: f // Keep 'file' for web object URL creation
                 };
                 songs.push(song);
                 renderList();
@@ -1191,6 +1206,7 @@
                 document.getElementById('actionRemovePlaylist').classList.add('hidden');
             }
 
+            document.getElementById('bottomSheet').style.display = 'flex';
             document.getElementById('bottomSheet').classList.remove('hidden');
             setTimeout(() => { document.getElementById('bottomSheetOverlay').classList.replace('opacity-0', 'opacity-100'); document.getElementById('bottomSheetContent').classList.remove('translate-y-full'); }, 10);
         }
@@ -1198,7 +1214,7 @@
         function closeMenu() {
             document.getElementById('bottomSheetOverlay').classList.replace('opacity-100', 'opacity-0');
             document.getElementById('bottomSheetContent').classList.add('translate-y-full');
-            setTimeout(() => document.getElementById('bottomSheet').classList.add('hidden'), 300);
+            setTimeout(() => { document.getElementById('bottomSheet').style.display = 'none'; document.getElementById('bottomSheet').classList.add('hidden'); }, 300);
         }
         document.getElementById('bottomSheetOverlay').onclick = closeMenu;
 
@@ -1244,11 +1260,15 @@
             activeSongId = id; const s = songs.find(x => x.id === id);
             if(!s) return;
             
-            audio.src = 'file://' + s.path.replace(/\\/g, '/');
+            // Critical patch: allows audio to play in normal Web Browsers
+            if (!window.electronAPI && s.file) {
+                audio.src = URL.createObjectURL(s.file);
+            } else {
+                audio.src = 'file://' + s.path.replace(/\\/g, '/');
+            }
             
             audio.play().catch(e => {
                 console.error("Error playing file", e);
-                if (!window.electronAPI && s.file) audio.src = URL.createObjectURL(s.file);
             });
             
             playing = true;
