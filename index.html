@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Blossom Cloud Player</title>
     
     <!-- Added Favicon Cache-Buster for GitHub Pages -->
@@ -18,7 +18,9 @@
            DYNAMIC THEME ENGINE & ANIMATIONS
            ========================================= */
         [id$="Modal"], #bottomSheet { display: none; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; overflow: hidden; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        
+        /* 100dvh prevents mobile browser URL bars from cutting off the footer */
+        body { margin: 0; font-family: 'Poppins', sans-serif; overflow: hidden; height: 100dvh; display: flex; align-items: center; justify-content: center; }
 
         /* --- THEME 1: DARK AMBIENT (Default) --- */
         body.theme-dark {
@@ -98,8 +100,12 @@
         .item-glass { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
         .item-glass:hover:not(.active-gradient) { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); transform: translateX(6px); }
 
+        /* Responsive Search Container */
         .search-container { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 40px; height: 40px; overflow: hidden; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 9999px; }
-        .search-container.expanded { width: 300px; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+        .search-container.expanded { width: 180px; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+        @media (min-width: 768px) {
+            .search-container.expanded { width: 300px; }
+        }
 
         .hide-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .hide-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -115,21 +121,21 @@
     </style>
 </head>
 
-<body class="theme-dark">
+<body class="theme-dark text-[15px] md:text-base">
 
     <!-- Cinematic Splash Screen -->
     <div id="splashScreen" class="fixed inset-0 flex flex-col items-center justify-center pointer-events-auto">
         <div class="absolute inset-0 splash-bg-anim bg-gradient-to-br from-black/40 to-transparent z-0"></div>
-        <div class="relative z-10 flex flex-col items-center w-full h-full justify-center">
+        <div class="relative z-10 flex flex-col items-center w-full h-full justify-center px-4">
             <div class="splash-logo-container mb-6">
-                <span class="text-8xl logo-animated block drop-shadow-2xl">🌸</span>
+                <span class="text-7xl md:text-8xl logo-animated block drop-shadow-2xl">🌸</span>
             </div>
             <div class="splash-title-container text-center">
-                <h1 class="text-6xl font-extrabold text-white tracking-tight drop-shadow-lg">Blossom</h1>
-                <p id="splashQuote" class="mt-5 text-white/80 font-medium italic tracking-wide text-xl splash-quote-anim"></p>
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg">Blossom</h1>
+                <p id="splashQuote" class="mt-4 md:mt-5 text-white/80 font-medium italic tracking-wide text-lg md:text-xl splash-quote-anim"></p>
             </div>
             <div class="absolute bottom-12 overflow-hidden opacity-0" style="animation: splash-fade-in 2s ease-out forwards; animation-delay: 1.5s;">
-                <p class="text-[10px] text-white/40 tracking-[0.4em] uppercase font-bold">Global Engine Active</p>
+                <p class="text-[9px] md:text-[10px] text-white/40 tracking-[0.4em] uppercase font-bold">Global Engine Active</p>
             </div>
         </div>
         <div class="absolute inset-0 bg-black/60 z-[-1]"></div>
@@ -137,10 +143,10 @@
 
     <!-- Modals -->
     <!-- Name Prompt Modal -->
-    <div id="nameModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center hidden opacity-0 transition-all duration-500">
-        <div class="app-glass rounded-[2rem] p-10 w-full max-w-sm flex flex-col items-center border border-white/10 shadow-2xl relative overflow-hidden text-center">
-            <span class="text-6xl mb-6 logo-animated">🌸</span>
-            <h2 class="text-3xl font-extrabold mb-2 text-white">Welcome!</h2>
+    <div id="nameModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center hidden opacity-0 transition-all duration-500 px-4">
+        <div class="app-glass rounded-[2rem] p-8 md:p-10 w-full max-w-sm flex flex-col items-center border border-white/10 shadow-2xl relative overflow-hidden text-center">
+            <span class="text-5xl md:text-6xl mb-6 logo-animated">🌸</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold mb-2 text-white">Welcome!</h2>
             <p class="text-white/60 text-sm font-medium mb-8">What should we call you?</p>
             <input type="text" id="nameInput" placeholder="Your Name" class="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white mb-6 focus:outline-none focus:border-rose-400 focus:bg-black/60 transition-all font-bold text-center text-lg shadow-inner placeholder-white/20" onkeypress="if(event.key === 'Enter') document.getElementById('saveNameBtn').click()">
             <button id="saveNameBtn" class="w-full py-4 rounded-xl active-gradient text-white font-bold text-lg btn-anim shadow-lg">Start Listening</button>
@@ -148,66 +154,66 @@
     </div>
 
     <!-- Feedback Modal (Discord Integration) -->
-    <div id="feedbackModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[80] flex items-center justify-center hidden opacity-0 transition-all duration-300">
-        <div class="app-glass rounded-[2rem] p-8 w-full max-w-md flex flex-col relative border border-white/10 shadow-2xl">
+    <div id="feedbackModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[80] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-[2rem] p-6 md:p-8 w-full max-w-md flex flex-col relative border border-white/10 shadow-2xl">
             <button class="close-modal-btn absolute top-5 right-5 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
-            <h2 class="text-2xl font-bold mb-2 text-white flex items-center gap-2"><i data-lucide="send" class="text-rose-400 w-6 h-6"></i> Send Feedback</h2>
-            <p class="text-white/50 text-sm mb-6">Drop your suggestions or bugs. It goes straight to my Discord!</p>
+            <h2 class="text-xl md:text-2xl font-bold mb-2 text-white flex items-center gap-2"><i data-lucide="send" class="text-rose-400 w-5 h-5 md:w-6 md:h-6"></i> Send Feedback</h2>
+            <p class="text-white/50 text-xs md:text-sm mb-6">Drop your suggestions or bugs. It goes straight to my Discord!</p>
             
-            <input type="text" id="feedbackName" placeholder="Your Name (Optional)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-rose-400 transition-colors placeholder-white/30">
-            <textarea id="feedbackText" rows="4" placeholder="Type your feedback here..." class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-rose-400 transition-colors resize-none placeholder-white/30"></textarea>
+            <input type="text" id="feedbackName" placeholder="Your Name (Optional)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-rose-400 transition-colors placeholder-white/30 text-sm">
+            <textarea id="feedbackText" rows="4" placeholder="Type your feedback here..." class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-rose-400 transition-colors resize-none placeholder-white/30 text-sm"></textarea>
             
-            <button id="sendFeedbackBtn" class="w-full py-3.5 rounded-xl active-gradient text-white font-bold text-lg btn-anim shadow-lg flex justify-center items-center gap-2 transition-all">
+            <button id="sendFeedbackBtn" class="w-full py-3.5 rounded-xl active-gradient text-white font-bold text-base md:text-lg btn-anim shadow-lg flex justify-center items-center gap-2 transition-all">
                 <span id="fbBtnText">Send to Discord</span>
             </button>
         </div>
     </div>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300">
-        <div class="app-glass rounded-3xl p-8 w-full max-w-md flex flex-col">
+    <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-md flex flex-col">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-white">App Settings</h2>
+                <h2 class="text-xl md:text-2xl font-bold text-white">App Settings</h2>
                 <button class="close-modal-btn text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             <div class="mb-4">
-                <p class="text-xs uppercase tracking-widest text-white/50 font-bold mb-4">Select Theme</p>
+                <p class="text-[10px] md:text-xs uppercase tracking-widest text-white/50 font-bold mb-4">Select Theme</p>
                 <div class="grid grid-cols-2 gap-4">
                     <button class="theme-select-btn flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-dark">
-                        <div class="w-full h-16 rounded-xl bg-black overflow-hidden relative shadow-inner">
+                        <div class="w-full h-12 md:h-16 rounded-xl bg-black overflow-hidden relative shadow-inner">
                             <div class="absolute inset-0 bg-gradient-to-br from-[#103b4a] to-[#750e32] opacity-50"></div>
                         </div>
-                        <span class="text-sm font-bold text-white">Dark Ambient</span>
+                        <span class="text-xs md:text-sm font-bold text-white">Dark Ambient</span>
                     </button>
                     <button class="theme-select-btn flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-pink">
-                        <div class="w-full h-16 rounded-xl bg-gradient-to-br from-[#e06d8c] to-[#d66a98] shadow-inner"></div>
-                        <span class="text-sm font-bold text-white">Pink Blossom</span>
+                        <div class="w-full h-12 md:h-16 rounded-xl bg-gradient-to-br from-[#e06d8c] to-[#d66a98] shadow-inner"></div>
+                        <span class="text-xs md:text-sm font-bold text-white">Pink Blossom</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Song Info Panel (Triggered by Full-Screen 3 Dots) -->
-    <div id="infoModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] flex items-center justify-center hidden opacity-0 transition-all duration-300">
-        <div class="app-glass rounded-3xl p-8 w-full max-w-sm flex flex-col relative border border-white/10 shadow-2xl">
+    <!-- Song Info Panel -->
+    <div id="infoModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-sm flex flex-col relative border border-white/10 shadow-2xl">
             <button onclick="closeInfoModal()" class="absolute top-5 right-5 text-white/50 hover:text-white transition close-info-btn"><i data-lucide="x" class="w-6 h-6"></i></button>
             
             <div class="flex items-center gap-4 mb-8 mt-2">
-                <div class="w-20 h-20 rounded-xl overflow-hidden bg-white/5 shrink-0 shadow-md relative">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-white/5 shrink-0 shadow-md relative">
                     <img id="infoArt" src="" class="w-full h-full object-cover hidden absolute inset-0 z-10">
                     <div id="infoFallback" class="w-full h-full flex items-center justify-center text-3xl absolute inset-0 z-0">🌸</div>
                 </div>
                 <div class="overflow-hidden">
-                    <h3 id="infoTitle" class="text-xl font-extrabold text-white truncate mb-1">Song Title</h3>
-                    <p id="infoArtist" class="text-white/60 text-sm font-medium truncate">Artist</p>
+                    <h3 id="infoTitle" class="text-lg md:text-xl font-extrabold text-white truncate mb-1">Song Title</h3>
+                    <p id="infoArtist" class="text-white/60 text-xs md:text-sm font-medium truncate">Artist</p>
                 </div>
             </div>
             
-            <div class="space-y-4 mb-8 text-sm font-medium">
+            <div class="space-y-4 mb-8 text-xs md:text-sm font-medium">
                 <div class="flex justify-between border-b border-white/5 pb-2">
                     <span class="text-white/40">Audio Quality</span>
-                    <span class="text-white flex items-center gap-1.5"><i data-lucide="sparkles" class="w-4 h-4 text-rose-400"></i> Lossless</span>
+                    <span class="text-white flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-400"></i> Lossless</span>
                 </div>
                 <div class="flex justify-between border-b border-white/5 pb-2">
                     <span class="text-white/40">Track Length</span>
@@ -220,82 +226,88 @@
             </div>
             
             <!-- Creator Socials Flex -->
-            <div class="flex justify-center gap-6 pt-5 border-t border-white/10 text-white/30">
-                <a href="https://www.instagram.com/varun_kulkarni__/" target="_blank" class="hover:text-white transition-colors" title="Developer Instagram"><i data-lucide="instagram" class="w-6 h-6"></i></a>
-                <a href="https://github.com/VarunKulkarni15" target="_blank" class="hover:text-white transition-colors" title="Developer GitHub"><i data-lucide="github" class="w-6 h-6"></i></a>
+            <div class="flex justify-center gap-6 pt-3 md:pt-5 border-t border-white/10 text-white/30">
+                <a href="https://www.instagram.com/varun_kulkarni__/" target="_blank" class="hover:text-white transition-colors" title="Developer Instagram"><i data-lucide="instagram" class="w-5 h-5 md:w-6 md:h-6"></i></a>
+                <a href="https://github.com/VarunKulkarni15" target="_blank" class="hover:text-white transition-colors" title="Developer GitHub"><i data-lucide="github" class="w-5 h-5 md:w-6 md:h-6"></i></a>
             </div>
         </div>
     </div>
 
-    <!-- Input Modal (Playlist Creation/Rename) -->
-    <div id="inputModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300">
-        <div class="app-glass rounded-3xl p-8 w-full max-w-sm flex flex-col">
-            <h2 id="inputModalTitle" class="text-xl font-bold mb-4 text-white">New Playlist</h2>
-            <input type="text" id="inputModalField" placeholder="Playlist Name" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white mb-6 focus:outline-none focus:bg-black/50 transition-all font-medium">
+    <!-- Input Modal (Playlist) -->
+    <div id="inputModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-sm flex flex-col">
+            <h2 id="inputModalTitle" class="text-lg md:text-xl font-bold mb-4 text-white">New Playlist</h2>
+            <input type="text" id="inputModalField" placeholder="Playlist Name" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white mb-6 focus:outline-none focus:bg-black/50 transition-all font-medium text-sm md:text-base">
             <div class="flex gap-4">
-                <button class="close-modal-btn flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold btn-anim border border-white/5">Cancel</button>
-                <button id="inputModalSave" class="flex-1 py-3 rounded-xl active-gradient text-white font-bold btn-anim shadow-lg">Save</button>
+                <button class="close-modal-btn flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold btn-anim border border-white/5 text-sm md:text-base">Cancel</button>
+                <button id="inputModalSave" class="flex-1 py-3 rounded-xl active-gradient text-white font-bold btn-anim shadow-lg text-sm md:text-base">Save</button>
             </div>
         </div>
     </div>
 
     <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300">
-        <div class="app-glass rounded-3xl p-8 w-full max-w-sm flex flex-col text-center border border-white/10">
-            <div class="w-16 h-16 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-500/30">
-                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+    <div id="confirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-sm flex flex-col text-center border border-white/10">
+            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-500/30">
+                <i data-lucide="alert-triangle" class="w-6 h-6 md:w-8 md:h-8"></i>
             </div>
-            <h2 id="confirmModalTitle" class="text-xl font-bold mb-2 text-white">Confirm Action</h2>
-            <p id="confirmModalText" class="text-white/60 mb-8 font-medium text-sm">Are you sure?</p>
+            <h2 id="confirmModalTitle" class="text-lg md:text-xl font-bold mb-2 text-white">Confirm Action</h2>
+            <p id="confirmModalText" class="text-white/60 mb-8 font-medium text-xs md:text-sm">Are you sure?</p>
             <div class="flex gap-4">
-                <button class="close-modal-btn flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold btn-anim border border-white/10">Cancel</button>
-                <button id="confirmModalAction" class="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold btn-anim shadow-lg transition-colors">Confirm</button>
+                <button class="close-modal-btn flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold btn-anim border border-white/10 text-sm md:text-base">Cancel</button>
+                <button id="confirmModalAction" class="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold btn-anim shadow-lg transition-colors text-sm md:text-base">Confirm</button>
             </div>
         </div>
     </div>
 
     <!-- Playlist Selection Modal -->
-    <div id="playlistSelectModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div id="playlistSelectModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
         <div class="app-glass rounded-3xl p-6 w-full max-w-sm flex flex-col">
-            <h2 class="text-xl font-bold mb-4 text-white text-center">Add to Playlist</h2>
+            <h2 class="text-lg md:text-xl font-bold mb-4 text-white text-center">Add to Playlist</h2>
             <div id="playlistSelectList" class="max-h-60 overflow-y-auto hide-scrollbar space-y-2 mb-4"></div>
-            <button class="close-modal-btn w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold btn-anim border border-white/5">Cancel</button>
+            <button class="close-modal-btn w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold btn-anim border border-white/5 text-sm md:text-base">Cancel</button>
         </div>
     </div>
 
     <!-- Bottom Context Sheet (3-Dots Menu) -->
     <div id="bottomSheet" class="fixed inset-x-0 bottom-0 h-full bg-transparent z-50 pointer-events-none flex flex-col justify-end hidden">
-        <div id="bottomSheetOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-auto"></div>
-        <div id="bottomSheetContent" class="app-glass w-full max-w-2xl mx-auto rounded-t-[2.5rem] p-8 transform translate-y-full transition-transform duration-300 pointer-events-auto border-b-0 pb-12 shadow-2xl">
-            <div class="w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-            <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
-                <div class="w-16 h-16 rounded-xl bg-white/5 overflow-hidden flex items-center justify-center shrink-0 border border-white/10 shadow-lg relative">
+        <div id="bottomSheetOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-auto z-40"></div>
+        <div id="bottomSheetContent" class="app-glass w-full max-w-2xl mx-auto rounded-t-[2rem] md:rounded-t-[2.5rem] p-6 md:p-8 transform translate-y-full transition-transform duration-300 pointer-events-auto border-b-0 pb-10 md:pb-12 shadow-2xl relative z-50">
+            <div class="w-12 md:w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+            <div class="flex items-center gap-4 mb-6 md:mb-8 border-b border-white/10 pb-6">
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-white/5 overflow-hidden flex items-center justify-center shrink-0 border border-white/10 shadow-lg relative">
                     <img id="sheetArt" src="" class="w-full h-full object-cover hidden absolute inset-0 z-10">
-                    <div id="sheetFallback" class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent flex items-center justify-center z-0"><span class="text-3xl filter drop-shadow-md">🌸</span></div>
+                    <div id="sheetFallback" class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent flex items-center justify-center z-0"><span class="text-2xl md:text-3xl filter drop-shadow-md">🌸</span></div>
                 </div>
                 <div class="overflow-hidden">
-                    <h3 id="sheetTitle" class="text-2xl font-extrabold text-white truncate better-text-shadow tracking-wide">Song Title</h3>
-                    <p id="sheetArtist" class="text-white/60 font-medium text-base truncate mt-1">Artist Name</p>
+                    <h3 id="sheetTitle" class="text-xl md:text-2xl font-extrabold text-white truncate better-text-shadow tracking-wide">Song Title</h3>
+                    <p id="sheetArtist" class="text-white/60 font-medium text-sm md:text-base truncate mt-1">Artist Name</p>
                 </div>
             </div>
             <div class="space-y-2">
-                <button id="actionPlayNext" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-lg transition-colors"><i data-lucide="corner-down-right" class="w-6 h-6 text-white/60"></i> Play Next</button>
-                <button id="actionAddQueue" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-lg transition-colors"><i data-lucide="list-plus" class="w-6 h-6 text-white/60"></i> Add to Queue</button>
-                <button id="actionAddPlaylist" class="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-lg transition-colors"><i data-lucide="folder-plus" class="w-6 h-6 text-white/60"></i> Add to Playlist</button>
-                <button id="actionRemovePlaylist" class="hidden w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/10 text-rose-400 font-bold btn-anim text-lg transition-colors"><i data-lucide="folder-minus" class="w-6 h-6 text-rose-400"></i> Remove from Playlist</button>
+                <button id="actionPlayNext" class="w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="corner-down-right" class="w-5 h-5 md:w-6 md:h-6 text-white/60"></i> Play Next</button>
+                <button id="actionAddQueue" class="w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="list-plus" class="w-5 h-5 md:w-6 md:h-6 text-white/60"></i> Add to Queue</button>
+                <button id="actionAddPlaylist" class="w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="folder-plus" class="w-5 h-5 md:w-6 md:h-6 text-white/60"></i> Add to Playlist</button>
+                <button id="actionRemovePlaylist" class="hidden w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-rose-400 font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="folder-minus" class="w-5 h-5 md:w-6 md:h-6 text-rose-400"></i> Remove from Playlist</button>
             </div>
         </div>
     </div>
 
-    <!-- Background Petals (Controlled by Theme) -->
+    <!-- Background Petals -->
     <div id="petals-container" class="absolute inset-0 z-0 overflow-hidden pointer-events-none"></div>
 
-    <!-- Main App Container -->
-    <div class="app-glass rounded-[2.5rem] w-[95vw] max-w-6xl h-[85vh] relative flex flex-col overflow-hidden z-10 shadow-2xl">
-        <div class="flex flex-1 overflow-hidden">
+    <!-- Main App Container (Responsive) -->
+    <div class="app-glass w-full h-full md:w-[95vw] md:h-[85vh] md:max-w-6xl md:rounded-[2.5rem] relative flex flex-col overflow-hidden z-10 md:shadow-2xl">
+        <div class="flex flex-1 overflow-hidden relative">
             
-            <!-- Sidebar -->
-            <aside class="w-64 panel-glass flex flex-col py-8 px-4 z-20">
+            <!-- Sidebar Mobile Overlay (Moved inside flex container for perfect stacking) -->
+            <div id="sidebarOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden opacity-0 transition-opacity duration-300"></div>
+
+            <!-- Sidebar (Responsive: Slides in on mobile, fixed on desktop) -->
+            <aside id="sidebar" class="w-64 shrink-0 panel-glass flex flex-col py-8 px-4 z-50 absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 bg-[#050508]/95 md:bg-transparent backdrop-blur-3xl md:backdrop-blur-none border-r border-white/10 md:border-none">
+                <!-- Close Sidebar Button (Mobile Only) -->
+                <button id="closeSidebarBtn" class="md:hidden absolute top-6 right-4 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+
                 <div class="flex items-center gap-3 mb-10 px-2">
                     <span class="text-3xl logo-animated" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));">🌸</span>
                     <h1 class="text-2xl font-bold text-white tracking-tight">Blossom</h1>
@@ -318,8 +330,7 @@
                 </nav>
 
                 <div class="mt-4 border-t border-white/10 pt-6 px-2">
-                    <!-- Feedback Button -->
-                    <button onclick="showModal('feedbackModal')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 font-medium transition btn-anim mb-4 border border-transparent">
+                    <button onclick="if(window.innerWidth < 768) toggleSidebar(true); showModal('feedbackModal')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 font-medium transition btn-anim mb-4 border border-transparent">
                         <i data-lucide="message-square" class="w-4 h-4"></i> <span class="text-sm">Send Feedback</span>
                     </button>
 
@@ -332,72 +343,79 @@
             </aside>
 
             <!-- Main Content -->
-            <main class="flex-1 flex flex-col p-10 overflow-hidden relative">
-                <header class="flex justify-between items-start mb-8 shrink-0 z-20">
+            <main class="flex-1 flex flex-col p-4 md:p-10 overflow-hidden relative w-full">
+                <header class="flex justify-between items-start mb-6 md:mb-8 shrink-0 z-20">
                     <div class="flex flex-col">
-                        <p id="greetingText" class="text-white/60 font-medium text-sm mb-1 tracking-wide">Good evening ✨</p>
+                        <!-- Mobile Hamburger + Greeting -->
+                        <div class="flex items-center gap-3 mb-1">
+                            <button id="openSidebarBtn" class="md:hidden text-white/70 hover:text-white transition"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                            <p id="greetingText" class="text-white/60 font-medium text-xs md:text-sm tracking-wide">Good evening ✨</p>
+                        </div>
                         <div class="flex items-center gap-4">
-                            <h2 id="mainHeaderTitle" class="text-4xl font-extrabold text-white better-text-shadow tracking-tight">Explore</h2>
+                            <h2 id="mainHeaderTitle" class="text-2xl md:text-4xl font-extrabold text-white better-text-shadow tracking-tight">Explore</h2>
                             
                             <div id="playlistActions" class="hidden items-center gap-1">
-                                <button id="editPlaylistBtn" class="text-white/40 hover:text-white p-2 rounded-lg hover:bg-white/10 transition btn-anim shadow-sm" title="Rename Playlist"><i data-lucide="pencil" class="w-5 h-5"></i></button>
-                                <button id="deletePlaylistBtn" class="text-white/40 hover:text-rose-500 p-2 rounded-lg hover:bg-white/10 transition btn-anim shadow-sm" title="Delete Playlist"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                                <button id="editPlaylistBtn" class="text-white/40 hover:text-white p-2 rounded-lg hover:bg-white/10 transition btn-anim shadow-sm" title="Rename Playlist"><i data-lucide="pencil" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+                                <button id="deletePlaylistBtn" class="text-white/40 hover:text-rose-500 p-2 rounded-lg hover:bg-white/10 transition btn-anim shadow-sm" title="Delete Playlist"><i data-lucide="trash-2" class="w-4 h-4 md:w-5 md:h-5"></i></button>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3 md:gap-4 mt-1 md:mt-0">
                         <div id="searchBox" class="search-container flex items-center shadow-md">
-                            <button id="searchTrigger" class="w-10 h-10 flex items-center justify-center shrink-0 text-white/70 hover:text-white transition"><i data-lucide="search" class="w-5 h-5"></i></button>
+                            <button id="searchTrigger" class="w-10 h-10 flex items-center justify-center shrink-0 text-white/70 hover:text-white transition"><i data-lucide="search" class="w-4 h-4 md:w-5 md:h-5"></i></button>
                             <input type="text" id="searchInput" placeholder="Search global database..." class="bg-transparent border-none focus:ring-0 text-white font-medium text-sm w-full outline-none pr-3 opacity-0 pointer-events-none transition-opacity duration-300 placeholder-white/30">
                             <div id="searchLoader" class="hidden loader mr-3 shrink-0"></div>
                         </div>
                         
-                        <button id="settingsBtn" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/70 hover:text-white btn-anim border border-white/10 shadow-md hover:bg-white/10" title="Themes & Settings"><i data-lucide="settings" class="w-5 h-5"></i></button>
+                        <button id="settingsBtn" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/70 hover:text-white btn-anim border border-white/10 shadow-md hover:bg-white/10 shrink-0" title="Themes & Settings"><i data-lucide="settings" class="w-4 h-4 md:w-5 md:h-5"></i></button>
                     </div>
                 </header>
 
-                <div id="songList" class="flex-1 overflow-y-auto hide-scrollbar space-y-2.5 pr-4 pb-4">
+                <div id="songList" class="flex-1 overflow-y-auto hide-scrollbar space-y-2 md:space-y-2.5 pr-2 md:pr-4 pb-4">
                     <div class="h-full flex flex-col items-center justify-center text-white/20">
-                        <i data-lucide="cloud-search" class="w-20 h-20 mb-4 opacity-20"></i>
-                        <p class="italic text-lg font-medium">Search for an artist or song to stream.</p>
+                        <i data-lucide="cloud-search" class="w-16 h-16 md:w-20 md:h-20 mb-4 opacity-20"></i>
+                        <p class="italic text-base md:text-lg font-medium text-center">Search for an artist or song.</p>
                     </div>
                 </div>
             </main>
         </div>
 
-        <footer class="h-28 panel-glass border-t border-white/10 px-8 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.4)] z-30 relative group">
-            <div class="flex items-center gap-5 w-1/3">
-                <!-- Hovering the art shows an expand icon to trigger Full Screen -->
-                <div onclick="openFullScreen()" class="w-16 h-16 rounded-xl bg-black/40 flex items-center justify-center overflow-hidden border border-white/5 shadow-lg shrink-0 relative cursor-pointer btn-anim hover:border-white/20 transition-colors">
+        <!-- Responsive Footer Player -->
+        <footer class="h-20 md:h-28 panel-glass border-t border-white/10 px-4 md:px-8 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.4)] z-30 relative group">
+            
+            <!-- Mobile Progress Bar (Absolute Top of Footer) -->
+            <input type="range" id="mobileProgress" class="md:hidden absolute top-0 left-0 w-full h-[3px] bg-white/10 accent-rose-400 appearance-none cursor-pointer z-40 m-0 p-0" value="0" style="transform: translateY(-50%);">
+
+            <div class="flex items-center gap-3 md:gap-5 w-1/2 md:w-1/3">
+                <div onclick="openFullScreen()" class="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-black/40 flex items-center justify-center overflow-hidden border border-white/5 shadow-lg shrink-0 relative cursor-pointer btn-anim hover:border-white/20 transition-colors">
                     <img id="trackArt" class="w-full h-full object-cover hidden absolute inset-0 z-10 transition-all duration-300 group-hover:brightness-50">
-                    <div id="trackFallback" class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent flex items-center justify-center z-0 transition-all duration-300 group-hover:brightness-50"><span class="text-3xl filter drop-shadow-md">🌸</span></div>
-                    <!-- Expand Icon -->
-                    <i data-lucide="maximize-2" class="w-6 h-6 text-white absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    <div id="trackFallback" class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent flex items-center justify-center z-0 transition-all duration-300 group-hover:brightness-50"><span class="text-xl md:text-3xl filter drop-shadow-md">🌸</span></div>
+                    <i data-lucide="maximize-2" class="w-5 h-5 md:w-6 md:h-6 text-white absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block"></i>
                 </div>
                 <div class="overflow-hidden flex-1 cursor-pointer" onclick="openFullScreen()">
-                    <h4 id="trackTitle" class="text-white font-extrabold truncate text-lg tracking-wide better-text-shadow hover:text-rose-400 transition-colors">No track playing</h4>
-                    <p id="trackArtist" class="text-white/50 font-medium text-sm truncate mt-0.5">-</p>
+                    <h4 id="trackTitle" class="text-white font-extrabold truncate text-sm md:text-lg tracking-wide better-text-shadow hover:text-rose-400 transition-colors">No track</h4>
+                    <p id="trackArtist" class="text-white/50 font-medium text-xs md:text-sm truncate mt-0.5">-</p>
                 </div>
-                <button id="trackFavBtn" class="ml-2 btn-anim shrink-0 hover:scale-110 transition-transform"><i id="trackFavIcon" data-lucide="heart" class="w-6 h-6 text-white/30"></i></button>
+                <button id="trackFavBtn" class="hidden md:block ml-2 btn-anim shrink-0 hover:scale-110 transition-transform"><i id="trackFavIcon" data-lucide="heart" class="w-6 h-6 text-white/30"></i></button>
             </div>
 
-            <div class="flex flex-col items-center gap-3 w-1/3">
-                <div class="flex items-center gap-8">
-                    <button onclick="playPrev()" id="prevBtn" class="text-white/60 hover:text-white btn-anim hover:scale-110"><i data-lucide="skip-back" class="w-6 h-6 fill-current"></i></button>
-                    <!-- Main Play Button powered by CSS Engine -->
-                    <button onclick="togglePlay()" id="playBtn" class="w-14 h-14 rounded-full flex items-center justify-center btn-anim hover:scale-105 transition-transform play-btn-bg">
-                        <i data-lucide="play" id="playIcon" class="w-7 h-7 fill-current translate-x-0.5"></i>
+            <div class="flex flex-col items-center justify-center md:gap-3 w-1/2 md:w-1/3">
+                <div class="flex items-center gap-4 md:gap-8 justify-end w-full md:justify-center">
+                    <button onclick="playPrev()" id="prevBtn" class="hidden md:block text-white/60 hover:text-white btn-anim hover:scale-110"><i data-lucide="skip-back" class="w-6 h-6 fill-current"></i></button>
+                    <!-- Main Play Button -->
+                    <button onclick="togglePlay()" id="playBtn" class="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center btn-anim hover:scale-105 transition-transform play-btn-bg shrink-0">
+                        <i data-lucide="play" id="playIcon" class="w-5 h-5 md:w-7 md:h-7 fill-current translate-x-0.5"></i>
                     </button>
-                    <button onclick="playNext()" id="nextBtn" class="text-white/60 hover:text-white btn-anim hover:scale-110"><i data-lucide="skip-forward" class="w-6 h-6 fill-current"></i></button>
+                    <button onclick="playNext()" id="nextBtn" class="text-white/60 hover:text-white btn-anim hover:scale-110"><i data-lucide="skip-forward" class="w-5 h-5 md:w-6 md:h-6 fill-current"></i></button>
                 </div>
-                <div class="w-full flex items-center gap-3 text-[11px] text-white/50 font-medium max-w-md">
+                <div class="hidden md:flex w-full items-center gap-3 text-[11px] text-white/50 font-medium max-w-md">
                     <span id="currTime" class="w-10 text-right">0:00</span>
                     <input type="range" id="progress" class="flex-1 accent-white h-1.5 bg-white/10 rounded-full cursor-pointer outline-none" value="0">
                     <span id="totalTime" class="w-10">0:00</span>
                 </div>
             </div>
 
-            <div class="w-1/3 flex justify-end items-center gap-4 pr-2">
+            <div class="hidden md:flex w-1/3 justify-end items-center gap-4 pr-2">
                 <i data-lucide="volume-2" class="w-5 h-5 text-white/50"></i>
                 <input type="range" id="volumeSlider" class="w-28 accent-white h-1.5 bg-white/10 rounded-full cursor-pointer outline-none" min="0" max="100" value="80">
             </div>
@@ -405,7 +423,7 @@
     </div>
 
     <!-- =========================================
-         THE ULTIMATE FLEX: CINEMATIC FULL SCREEN
+         THE ULTIMATE FLEX: CINEMATIC FULL SCREEN (Responsive)
          ========================================= -->
     <div id="fullScreenPlayer" class="fixed inset-0 z-[100] bg-black hidden flex-col translate-y-full">
         <!-- Blurred Background -->
@@ -413,53 +431,58 @@
         <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/60 to-[#050508] fs-bg-overlay"></div>
         
         <!-- Top Nav -->
-        <div class="relative z-10 flex justify-between items-center p-8 shrink-0">
-            <button onclick="closeFullScreen()" class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white transition-all btn-anim backdrop-blur-md border border-white/10"><i data-lucide="chevron-down" class="w-7 h-7"></i></button>
+        <div class="relative z-10 flex justify-between items-center p-6 md:p-8 shrink-0">
+            <button onclick="closeFullScreen()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white transition-all btn-anim backdrop-blur-md border border-white/10"><i data-lucide="chevron-down" class="w-6 h-6 md:w-7 md:h-7"></i></button>
             <div class="flex flex-col items-center">
-                <span class="text-white/40 font-extrabold tracking-[0.3em] uppercase text-[10px] mb-1">Now Playing</span>
-                <span id="fsContext" class="text-white/80 font-medium text-xs tracking-widest">Global Cloud</span>
+                <span class="text-white/40 font-extrabold tracking-[0.3em] uppercase text-[9px] md:text-[10px] mb-1">Now Playing</span>
+                <span id="fsContext" class="text-white/80 font-medium text-[10px] md:text-xs tracking-widest">Global Cloud</span>
             </div>
             <!-- Triggers the new Info Panel Modal -->
-            <button onclick="openInfoModal()" class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white transition-all btn-anim backdrop-blur-md border border-white/10"><i data-lucide="more-horizontal" class="w-6 h-6"></i></button>
+            <button onclick="openInfoModal()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white transition-all btn-anim backdrop-blur-md border border-white/10"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button>
         </div>
 
-        <!-- Main Content (Responsive using vh so it never overflows) -->
+        <!-- Main Content (Responsive) -->
         <div class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 md:p-8 w-full max-w-4xl mx-auto min-h-0">
-            <!-- Responsive Album Art (Won't push controls off screen) -->
-            <div class="w-56 h-56 md:w-[40vh] md:h-[40vh] max-h-[400px] max-w-[400px] rounded-3xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/20 mb-8 bg-black/40 flex items-center justify-center relative shrink-0">
+            
+            <!-- Dynamic Album Art sizing based on Viewport Height -->
+            <div class="w-[65vw] h-[65vw] max-w-[350px] max-h-[350px] md:w-[45vh] md:h-[45vh] md:max-w-[500px] md:max-h-[500px] rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/20 mb-6 md:mb-10 bg-black/40 flex items-center justify-center relative shrink-0">
                 <img id="fsArt" src="" class="w-full h-full object-cover hidden absolute inset-0 z-10">
-                <div id="fsFallback" class="absolute inset-0 flex items-center justify-center z-0 text-7xl filter drop-shadow-2xl hidden">🌸</div>
+                <div id="fsFallback" class="absolute inset-0 flex items-center justify-center z-0 text-6xl md:text-7xl filter drop-shadow-2xl hidden">🌸</div>
             </div>
             
-            <div class="w-full flex flex-col items-center shrink-0 px-4">
-                <h2 id="fsTitle" class="text-3xl md:text-4xl font-extrabold text-white text-center mb-2 better-text-shadow tracking-tight truncate w-full">No track playing</h2>
-                <p id="fsArtist" class="text-xl text-white/60 font-medium text-center truncate w-full">Select a track from the library</p>
+            <div class="w-full flex flex-col items-center shrink-0 px-4 md:px-8">
+                <h2 id="fsTitle" class="text-2xl md:text-5xl font-extrabold text-white text-center mb-1 md:mb-2 better-text-shadow tracking-tight truncate w-full">No track playing</h2>
+                <p id="fsArtist" class="text-base md:text-2xl text-white/60 font-medium text-center truncate w-full">Select a track from the library</p>
             </div>
             
             <!-- Beautiful Big Playback Controls -->
-            <div class="w-full max-w-2xl mt-8 flex flex-col items-center shrink-0">
+            <div class="w-full max-w-2xl mt-6 md:mt-12 flex flex-col items-center shrink-0 px-2 md:px-0">
                 <!-- Large Progress Bar -->
-                <div class="w-full flex items-center gap-5 text-sm text-white/60 font-medium mb-8">
-                    <span id="fsCurrTime">0:00</span>
-                    <input type="range" id="fsProgress" class="flex-1 accent-white h-2 bg-white/20 rounded-full cursor-pointer outline-none transition-all" value="0">
-                    <span id="fsTotalTime">0:00</span>
+                <div class="w-full flex items-center gap-3 md:gap-5 text-xs md:text-sm text-white/60 font-medium mb-6 md:mb-10">
+                    <span id="fsCurrTime" class="w-10 text-right">0:00</span>
+                    <input type="range" id="fsProgress" class="flex-1 accent-white h-1.5 md:h-2 bg-white/20 rounded-full cursor-pointer outline-none transition-all" value="0">
+                    <span id="fsTotalTime" class="w-10">0:00</span>
                 </div>
                 
                 <!-- Main Buttons -->
-                <div class="flex items-center gap-12">
-                    <button onclick="playPrev()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-back" class="w-10 h-10 fill-current"></i></button>
+                <div class="flex items-center gap-8 md:gap-12">
+                    <button onclick="playPrev()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-back" class="w-8 h-8 md:w-10 md:h-10 fill-current"></i></button>
                     
-                    <button onclick="togglePlay()" class="w-24 h-24 rounded-full bg-white text-black flex items-center justify-center btn-anim hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.4)]">
-                        <i data-lucide="play" id="fsPlayIcon" class="w-12 h-12 fill-current translate-x-1"></i>
+                    <button onclick="togglePlay()" class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white text-black flex items-center justify-center btn-anim hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.3)] md:shadow-[0_0_40px_rgba(255,255,255,0.4)]">
+                        <i data-lucide="play" id="fsPlayIcon" class="w-8 h-8 md:w-12 md:h-12 fill-current translate-x-1"></i>
                     </button>
                     
-                    <button onclick="playNext()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-forward" class="w-10 h-10 fill-current"></i></button>
+                    <button onclick="playNext()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-forward" class="w-8 h-8 md:w-10 md:h-10 fill-current"></i></button>
                 </div>
             </div>
+            
+            <!-- Mobile Footer spacing pad -->
+            <div class="h-4 md:h-0 w-full shrink-0"></div>
         </div>
     </div>
 
-    <audio id="mainAudio" crossorigin="anonymous"></audio>
+    <!-- AUDIO PLAYER -->
+    <audio id="mainAudio"></audio>
 
     <script>
         lucide.createIcons();
@@ -538,11 +561,6 @@
         }
 
         // --- DISCORD FEEDBACK WEBHOOK ---
-        // ---------------------------------------------------------
-        // 1. Go to your Discord server -> Channel Settings -> Integrations -> Webhooks.
-        // 2. Create a new Webhook and copy the URL.
-        // 3. Paste it into the variable below!
-        // ---------------------------------------------------------
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1480882298768330782/SJNH-ED1sc2XwwT5SA6YDl6jGDHuVKnGgkDbbanuKJHujbQXRQU-NkWext4wpyjENUat"; 
 
         document.getElementById('sendFeedbackBtn').onclick = async () => {
@@ -555,20 +573,14 @@
                 return;
             }
 
-            if(DISCORD_WEBHOOK_URL === "YOUR_DISCORD_WEBHOOK_URL_HERE") {
-                alert("Developer Warning: Please paste your Discord Webhook URL in the code first!");
-                return;
-            }
-
             btnText.innerText = "Sending...";
             
-            // Format a beautiful Discord Embed
             const payload = {
                 username: "Blossom Feedback Bot",
                 avatar_url: "https://i.imgur.com/8N8y8oX.png",
                 embeds: [{
                     title: "New App Feedback 🌸",
-                    color: 16737378, // Rose Pink
+                    color: 16737378,
                     fields: [
                         { name: "From User", value: name, inline: true },
                         { name: "Device Info", value: navigator.platform, inline: true },
@@ -620,6 +632,7 @@
 
         document.getElementById('settingsBtn').onclick = () => {
             const currentTheme = document.body.className;
+            if (window.innerWidth < 768) toggleSidebar(true);
             document.querySelectorAll('.theme-select-btn').forEach(btn => {
                 if (btn.dataset.theme === currentTheme) {
                     btn.classList.add('border-rose-400'); btn.classList.remove('border-white/10');
@@ -631,7 +644,6 @@
             showModal('settingsModal');
         };
 
-        // Petals Logic
         function startPetals() {
             const container = document.getElementById('petals-container');
             setInterval(() => {
@@ -647,6 +659,27 @@
             }, 400);
         }
         startPetals();
+
+        // --- MOBILE SIDEBAR TOGGLE ---
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar(forceClose = false) {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed && !forceClose) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+                setTimeout(() => sidebarOverlay.classList.replace('opacity-0', 'opacity-100'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => sidebarOverlay.classList.add('hidden'), 300);
+            }
+        }
+
+        document.getElementById('openSidebarBtn').onclick = () => toggleSidebar();
+        document.getElementById('closeSidebarBtn').onclick = () => toggleSidebar(true);
+        sidebarOverlay.onclick = () => toggleSidebar(true);
 
         // --- MODAL UTILS ---
         function showModal(id) {
@@ -687,6 +720,9 @@
 
         function setView(viewStr) {
             currentView = viewStr;
+            
+            if (window.innerWidth < 768) toggleSidebar(true);
+
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.replace('bg-white/10', 'bg-transparent');
                 btn.classList.replace('text-white', 'text-white/60');
@@ -709,7 +745,7 @@
                 mainHeaderTitle.innerText = "Explore";
                 searchBox.style.display = "flex";
                 if(cloudSongs.length === 0) {
-                    document.getElementById('songList').innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/20"><i data-lucide="cloud-search" class="w-20 h-20 mb-4 opacity-20"></i><p class="italic text-lg font-medium">Type to search millions of tracks.</p></div>`;
+                    document.getElementById('songList').innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/20"><i data-lucide="cloud-search" class="w-16 h-16 md:w-20 md:h-20 mb-4 opacity-20"></i><p class="italic text-base md:text-lg font-medium">Search for an artist or song.</p></div>`;
                     lucide.createIcons();
                 }
             } else {
@@ -727,6 +763,7 @@
 
         // --- PLAYLIST LOGIC ---
         document.getElementById('createPlaylistBtn').onclick = () => {
+            if (window.innerWidth < 768) toggleSidebar(true);
             document.getElementById('inputModalTitle').innerText = "New Playlist";
             document.getElementById('inputModalField').value = "";
             document.getElementById('inputModalField').dataset.mode = "create";
@@ -749,9 +786,10 @@
 
             if(mode === "create") {
                 if(!playlists[name]) playlists[name] = [];
+                currentView = `playlist:${name}`;
             } else {
                 const old = document.getElementById('inputModalField').dataset.oldName;
-                playlists[name] = playlists[old];
+                playlists[name] = playlists[old] || [];
                 delete playlists[old];
                 currentView = `playlist:${name}`;
             }
@@ -778,7 +816,7 @@
                 const btn = document.createElement('button');
                 btn.className = "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/60 hover:text-white font-medium transition btn-anim nav-btn border border-transparent truncate";
                 btn.dataset.view = `playlist:${name}`;
-                btn.innerHTML = `<i data-lucide="list-music" class="w-5 h-5 shrink-0"></i> <span class="truncate">${name}</span>`;
+                btn.innerHTML = `<i data-lucide="list-music" class="w-5 h-5 shrink-0"></i> <span class="truncate text-sm md:text-base">${name}</span>`;
                 btn.onclick = () => setView(`playlist:${name}`);
                 sb.appendChild(btn);
             });
@@ -830,15 +868,21 @@
                         tracks = data.data.results;
                     } else if (data.results) {
                         tracks = data.results;
+                    } else if (Array.isArray(data)) {
+                        tracks = data;
                     }
 
-                    if (tracks.length > 0) {
-                        return tracks.map(item => {
+                    if (tracks && tracks.length > 0) {
+                        let mappedTracks = tracks.map(item => {
                             let audioUrl = '';
-                            if (item.downloadUrl && Array.isArray(item.downloadUrl) && item.downloadUrl.length > 0) {
-                                audioUrl = item.downloadUrl[item.downloadUrl.length - 1].url || item.downloadUrl[item.downloadUrl.length - 1].link;
+                            if (Array.isArray(item.downloadUrl)) {
+                                audioUrl = item.downloadUrl[item.downloadUrl.length - 1]?.url || item.downloadUrl[item.downloadUrl.length - 1]?.link || '';
+                            } else if (typeof item.downloadUrl === 'string') {
+                                audioUrl = item.downloadUrl;
                             } else if (item.media_url) {
                                 audioUrl = item.media_url;
+                            } else if (item.url && typeof item.url === 'string' && item.url.includes('.mp4')) {
+                                audioUrl = item.url;
                             }
 
                             if (audioUrl && audioUrl.startsWith('http://')) {
@@ -846,8 +890,10 @@
                             }
 
                             let imageUrl = '';
-                            if (item.image && Array.isArray(item.image) && item.image.length > 0) {
-                                imageUrl = item.image[item.image.length - 1].url || item.image[item.image.length - 1].link;
+                            if (Array.isArray(item.image)) {
+                                imageUrl = item.image[item.image.length - 1]?.url || item.image[item.image.length - 1]?.link || '';
+                            } else if (typeof item.image === 'string') {
+                                imageUrl = item.image;
                             }
 
                             let artistName = 'Unknown Artist';
@@ -859,21 +905,25 @@
 
                             return {
                                 id: item.id || Math.random().toString(),
-                                title: decodeHTML(item.name || item.title),
+                                title: decodeHTML(item.name || item.title || 'Unknown Title'),
                                 artist: decodeHTML(artistName),
                                 cover: imageUrl,
                                 duration: parseInt(item.duration || 0, 10),
                                 url: audioUrl
                             };
-                        }).filter(song => song.url); 
+                        }).filter(song => song.url && song.url.startsWith('http')); 
+
+                        if (mappedTracks.length > 0) {
+                            return mappedTracks;
+                        }
                     }
                 } catch (err) {
-                    console.warn(`Server ${url} failed, trying backup...`);
+                    console.warn(`Server ${url} failed, trying backup...`, err);
                 }
             }
 
             try {
-                console.log("Servers blocked. Falling back to Apple iTunes API...");
+                console.log("Servers blocked or empty. Falling back to Apple iTunes API...");
                 const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=40`);
                 const itunesData = await itunesRes.json();
                 
@@ -963,7 +1013,7 @@
 
             if(vs.length === 0) {
                 if (currentView !== 'home') {
-                    listEl.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/40 italic font-medium text-lg">No songs to display here.</div>`;
+                    listEl.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/40 italic font-medium text-base md:text-lg">No songs to display here.</div>`;
                 }
                 return;
             }
@@ -971,28 +1021,28 @@
             vs.forEach((s, idx) => {
                 const isActive = s.id === activeSongId;
                 const row = document.createElement('div');
-                row.className = `item-glass p-3 rounded-2xl flex items-center justify-between cursor-pointer group mb-1.5 ${isActive ? 'active-gradient shadow-lg' : 'bg-white/5 border-white/5'}`;
+                row.className = `item-glass p-2 md:p-3 rounded-2xl flex items-center justify-between cursor-pointer group mb-1.5 ${isActive ? 'active-gradient shadow-lg' : 'bg-white/5 border-white/5'}`;
                 
                 const coverHtml = s.cover 
-                    ? `<img src="${s.cover}" class="w-12 h-12 rounded-xl object-cover shadow-md z-10 relative">` 
-                    : `<div class="w-12 h-12 rounded-xl fallback-cover flex items-center justify-center shadow-sm z-10 relative"><span class="text-xl filter drop-shadow-sm">🌸</span></div>`;
+                    ? `<img src="${s.cover}" class="w-10 h-10 md:w-12 md:h-12 rounded-xl object-cover shadow-md z-10 relative">` 
+                    : `<div class="w-10 h-10 md:w-12 md:h-12 rounded-xl fallback-cover flex items-center justify-center shadow-sm z-10 relative"><span class="text-lg md:text-xl filter drop-shadow-sm">🌸</span></div>`;
 
                 const indexOrVisualizer = isActive && playing
-                    ? `<div class="w-8 flex justify-center"><div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>`
-                    : `<span class="${isActive ? 'text-white/90' : 'text-white/40'} font-bold text-sm w-8 text-center">${idx + 1}</span>`;
+                    ? `<div class="w-6 md:w-8 flex justify-center"><div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>`
+                    : `<span class="${isActive ? 'text-white/90' : 'text-white/40'} font-bold text-xs md:text-sm w-6 md:w-8 text-center">${idx + 1}</span>`;
 
                 row.innerHTML = `
-                    <div class="flex items-center gap-4 flex-1 overflow-hidden" onclick="playSong('${s.id}')">
+                    <div class="flex items-center gap-2 md:gap-4 flex-1 overflow-hidden" onclick="playSong('${s.id}')">
                         ${indexOrVisualizer}
                         ${coverHtml}
-                        <div class="overflow-hidden pl-2">
-                            <h4 class="font-bold text-base tracking-wide better-text-shadow truncate transition-all duration-300 ${isActive ? 'text-white text-[1.1rem] font-extrabold glow-text' : 'text-white/90 group-hover:text-white'}">${s.title}</h4>
-                            <p class="${isActive ? 'text-white/90' : 'text-white/50'} font-medium text-sm truncate mt-0.5">${s.artist}</p>
+                        <div class="overflow-hidden pl-1 md:pl-2">
+                            <h4 class="font-bold text-sm md:text-base tracking-wide better-text-shadow truncate transition-all duration-300 ${isActive ? 'text-white text-[0.95rem] md:text-[1.1rem] font-extrabold glow-text' : 'text-white/90 group-hover:text-white'}">${s.title}</h4>
+                            <p class="${isActive ? 'text-white/90' : 'text-white/50'} font-medium text-xs md:text-sm truncate mt-0.5">${s.artist}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 pr-3">
-                        <button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-5 h-5 ${isFav(s.id) ? 'fav-active' : (isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white')}"></i></button>
-                        <button onclick="openMenu(event, '${s.id}')" class="p-2 shrink-0 ${isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white'} transition hover:scale-110"><i data-lucide="more-horizontal" class="w-6 h-6"></i></button>
+                    <div class="flex items-center gap-1 md:gap-2 pr-1 md:pr-3">
+                        <button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-4 h-4 md:w-5 md:h-5 ${isFav(s.id) ? 'fav-active' : (isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white')}"></i></button>
+                        <button onclick="openMenu(event, '${s.id}')" class="p-2 shrink-0 ${isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white'} transition hover:scale-110"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button>
                     </div>`;
                 listEl.appendChild(row);
             });
@@ -1003,7 +1053,6 @@
         window.openMenu = function(e, id) {
             e.stopPropagation(); contextSongId = id;
             
-            // Allow menu opening from currently playing/last played even if not rendered
             let s = getRenderedSongs().find(x => x.id === id);
             if (!s && library) s = library.find(x => x.id === id);
             if (!s && lastPlayed && lastPlayed.id === id) s = lastPlayed;
@@ -1052,10 +1101,7 @@
                 document.getElementById('infoFallback').classList.remove('hidden');
             }
 
-            // Update Track Duration
             document.getElementById('infoDuration').innerText = formatTimeNumber(s.duration);
-
-            // Assign a persistent random/current date just for the UI using Indian Date Format (DD/MM/YYYY)
             document.getElementById('infoDate').innerText = new Date().toLocaleDateString('en-IN');
 
             showModal('infoModal');
@@ -1124,20 +1170,18 @@
 
         window.playSong = function(id) {
             activeSongId = id; 
-            // Fix: Check cloudSongs, then library, then lastPlayed to ensure recent playback always works
             let s = getRenderedSongs().find(x => x.id === id);
             if (!s && library) s = library.find(x => x.id === id);
             if (!s && lastPlayed && lastPlayed.id === id) s = lastPlayed;
             if(!s) return;
             
-            // Save to Last Played Persistence
             lastPlayed = s;
             localStorage.setItem('blossomLastPlayed', JSON.stringify(lastPlayed));
             
             audio.src = s.url;
             audio.play().catch(e => {
                 console.error("Playback failed", e);
-                alert("Browser blocked audio. Please click play or ensure popups aren't blocked on GitHub Pages.");
+                alert("Browser blocked audio. Please click play or ensure popups aren't blocked.");
             });
             
             playing = true;
@@ -1149,17 +1193,14 @@
             const s = activeSongId ? getRenderedSongs().find(x => x.id === activeSongId) || library.find(x => x.id === activeSongId) || lastPlayed : lastPlayed;
             if(!s) return;
 
-            // Update bottom footer play icon
             playIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
             if(playing) playIcon.classList.remove('translate-x-0.5'); else playIcon.classList.add('translate-x-0.5');
 
-            // Update full screen play icon
             if (fsPlayIcon) {
                 fsPlayIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
                 if(playing) fsPlayIcon.classList.remove('translate-x-1'); else fsPlayIcon.classList.add('translate-x-1');
             }
             
-            // Footer Update
             document.getElementById('trackTitle').innerText = s.title;
             document.getElementById('trackArtist').innerText = s.artist;
             if(s.cover) { 
@@ -1172,9 +1213,8 @@
             }
             
             const favIcon = document.getElementById('trackFavIcon');
-            favIcon.className = `w-6 h-6 ${isFav(s.id) ? 'fav-active' : 'text-white/30'}`;
+            if(favIcon) favIcon.className = `w-6 h-6 ${isFav(s.id) ? 'fav-active' : 'text-white/30'}`;
             
-            // Update Full Screen Player details
             document.getElementById('fsTitle').innerText = s.title;
             document.getElementById('fsArtist').innerText = s.artist;
             if(s.cover) {
@@ -1190,7 +1230,6 @@
             lucide.createIcons();
         }
 
-        // Initialize UI with Last Played Song
         if (lastPlayed) {
             updatePlayerUI();
             document.getElementById('totalTime').innerText = formatTimeNumber(lastPlayed.duration);
@@ -1236,14 +1275,13 @@
             if(!audio.duration) return;
             const p = (audio.currentTime / audio.duration) * 100;
             
-            // Sync progress bar
             document.getElementById('progress').value = p;
+            document.getElementById('mobileProgress').value = p;
             document.getElementById('fsProgress').value = p;
             
             const currString = formatTimeNumber(audio.currentTime);
             const totalString = formatTimeNumber(audio.duration);
 
-            // Sync time text
             document.getElementById('currTime').innerText = currString;
             document.getElementById('fsCurrTime').innerText = currString;
             document.getElementById('totalTime').innerText = totalString;
@@ -1252,8 +1290,8 @@
         
         document.getElementById('volumeSlider').oninput = (e) => audio.volume = e.target.value / 100;
         
-        // Seek logic for progress bar
         document.getElementById('progress').oninput = (e) => audio.currentTime = (e.target.value/100) * audio.duration;
+        document.getElementById('mobileProgress').oninput = (e) => audio.currentTime = (e.target.value/100) * audio.duration;
         document.getElementById('fsProgress').oninput = (e) => audio.currentTime = (e.target.value/100) * audio.duration;
 
         function formatTimeNumber(seconds) {
