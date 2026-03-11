@@ -153,7 +153,7 @@
         </div>
     </div>
 
-    <!-- Spotlight Overlay (FIXED POSITIONING) -->
+    <!-- The PUBG-Style Spotlight Overlay (FIXED POSITIONING) -->
     <div id="tutorialOverlay" class="fixed inset-0 z-[150] hidden opacity-0 transition-opacity duration-1000 bg-black/80 backdrop-blur-[2px] pointer-events-auto">
         <!-- The Focus Area wraps directly over the shield button coordinates -->
         <div id="tutorialFocusArea" class="absolute flex flex-col items-center justify-center" style="transition: all 0.3s ease;">
@@ -455,6 +455,7 @@
                     <!-- Main Play Button -->
                     <button onclick="togglePlay()" id="playBtn" class="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center btn-anim hover:scale-105 transition-transform play-btn-bg shrink-0">
                         <i data-lucide="play" id="playIcon" class="w-5 h-5 md:w-7 md:h-7 fill-current translate-x-0.5"></i>
+                        <i data-lucide="pause" id="pauseIcon" class="w-5 h-5 md:w-7 md:h-7 fill-current hidden"></i>
                     </button>
                     <button onclick="playNext()" id="nextBtn" class="text-white/60 hover:text-white btn-anim hover:scale-110"><i data-lucide="skip-forward" class="w-5 h-5 md:w-6 md:h-6 fill-current"></i></button>
                 </div>
@@ -518,15 +519,15 @@
                 <div class="flex items-center gap-8 md:gap-12">
                     <button onclick="playPrev()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-back" class="w-8 h-8 md:w-10 md:h-10 fill-current"></i></button>
                     
-                    <button onclick="togglePlay()" class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white text-black flex items-center justify-center btn-anim hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.3)] md:shadow-[0_0_40px_rgba(255,255,255,0.4)]">
+                    <button onclick="togglePlay()" id="fsPlayBtn" class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white text-black flex items-center justify-center btn-anim hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.3)] md:shadow-[0_0_40px_rgba(255,255,255,0.4)]">
                         <i data-lucide="play" id="fsPlayIcon" class="w-8 h-8 md:w-12 md:h-12 fill-current translate-x-1"></i>
+                        <i data-lucide="pause" id="fsPauseIcon" class="w-8 h-8 md:w-12 md:h-12 fill-current hidden"></i>
                     </button>
                     
                     <button onclick="playNext()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-forward" class="w-8 h-8 md:w-10 md:h-10 fill-current"></i></button>
                 </div>
             </div>
             
-            <!-- Mobile Footer spacing pad -->
             <div class="h-4 md:h-0 w-full shrink-0"></div>
         </div>
     </div>
@@ -1272,9 +1273,6 @@
 
         // --- AUDIO ENGINE ---
         const audio = document.getElementById('mainAudio');
-        const playBtn = document.getElementById('playBtn');
-        const playIcon = document.getElementById('playIcon');
-        const fsPlayIcon = document.getElementById('fsPlayIcon');
 
         // DO NOT CHANGE: Using the user's original working code for playback
         window.playSong = function(id) {
@@ -1303,12 +1301,28 @@
             const s = activeSongId ? getRenderedSongs().find(x => x.id === activeSongId) || library.find(x => x.id === activeSongId) || lastPlayed : lastPlayed;
             if(!s) return;
 
-            playIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
-            if(playing) playIcon.classList.remove('translate-x-0.5'); else playIcon.classList.add('translate-x-0.5');
+            const pIcon = document.getElementById('playIcon');
+            const pPause = document.getElementById('pauseIcon');
+            if (pIcon && pPause) {
+                if (playing) {
+                    pIcon.classList.add('hidden');
+                    pPause.classList.remove('hidden');
+                } else {
+                    pIcon.classList.remove('hidden');
+                    pPause.classList.add('hidden');
+                }
+            }
 
-            if (fsPlayIcon) {
-                fsPlayIcon.setAttribute('data-lucide', playing ? 'pause' : 'play');
-                if(playing) fsPlayIcon.classList.remove('translate-x-1'); else fsPlayIcon.classList.add('translate-x-1');
+            const fsPIcon = document.getElementById('fsPlayIcon');
+            const fsPPause = document.getElementById('fsPauseIcon');
+            if (fsPIcon && fsPPause) {
+                if (playing) {
+                    fsPIcon.classList.add('hidden');
+                    fsPPause.classList.remove('hidden');
+                } else {
+                    fsPIcon.classList.remove('hidden');
+                    fsPPause.classList.add('hidden');
+                }
             }
             
             document.getElementById('trackTitle').innerText = s.title;
