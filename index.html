@@ -63,7 +63,7 @@
             background-size: 150% 150%; animation: emeraldGlow 15s ease-in-out infinite alternate;
         }
         body.theme-emerald #splashScreen { background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); }
-        body.theme-emerald .app-glass { background: rgba(2, 44, 34, 0.6); backdrop-filter: blur(40px) saturate(140%); border: 1px solid rgba(16, 185, 129, 0.15); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(16, 185, 129, 0.05); }
+        body.theme-emerald .app-glass { background: rgba(2, 44, 34, 0.6); backdrop-filter: blur(40px saturate(140%); border: 1px solid rgba(16, 185, 129, 0.15); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(16, 185, 129, 0.05); }
         body.theme-emerald .panel-glass { background: rgba(2, 44, 34, 0.4); border-right: 1px solid rgba(16, 185, 129, 0.1); }
         body.theme-emerald .active-gradient { background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.15) 100%) !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.15) !important; color: white !important;}
         body.theme-emerald .play-btn-bg { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 25px -5px rgba(16, 185, 129, 0.6); color: white; border: none; }
@@ -79,7 +79,7 @@
             background-size: 150% 150%; animation: emeraldGlow 15s ease-in-out infinite alternate;
         }
         body.theme-amethyst #splashScreen { background: linear-gradient(135deg, #0f0714 0%, #3b0764 100%); }
-        body.theme-amethyst .app-glass { background: rgba(20, 10, 25, 0.6); backdrop-filter: blur(40px) saturate(140%); border: 1px solid rgba(192, 132, 252, 0.15); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(192, 132, 252, 0.05); }
+        body.theme-amethyst .app-glass { background: rgba(20, 10, 25, 0.6); backdrop-filter: blur(40px saturate(140%); border: 1px solid rgba(192, 132, 252, 0.15); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(192, 132, 252, 0.05); }
         body.theme-amethyst .panel-glass { background: rgba(20, 10, 25, 0.4); border-right: 1px solid rgba(192, 132, 252, 0.1); }
         body.theme-amethyst .active-gradient { background: linear-gradient(135deg, rgba(192, 132, 252, 0.15) 0%, rgba(217, 70, 239, 0.15) 100%) !important; border: 1px solid rgba(192, 132, 252, 0.3) !important; color: white !important;}
         body.theme-amethyst .play-btn-bg { background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%); box-shadow: 0 8px 25px -5px rgba(192, 132, 252, 0.6); color: white; border: none; }
@@ -184,8 +184,9 @@
 
 <body class="theme-dark text-[15px] md:text-base">
 
-    <!-- DATA SAVER: Invisible YouTube Engine (Trick Browser Throttling) -->
-    <div id="yt-player-container" class="absolute pointer-events-none opacity-0" style="width: 300px; height: 300px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;"></div>
+    <!-- AD-SHIELD ENGINE: Privacy-Enhanced Invisible Iframe -->
+    <!-- Using low opacity instead of 0 to prevent browser speed throttling while blocking targeted ads -->
+    <div id="yt-player-container" class="absolute pointer-events-none opacity-[0.01]" style="width: 40px; height: 40px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;"></div>
 
     <!-- Cinematic Splash Screen -->
     <div id="splashScreen" class="fixed inset-0 flex flex-col items-center justify-center pointer-events-auto">
@@ -1208,7 +1209,7 @@
                 
                 const indexOrVisualizer = isActive && playing ? `<div class="w-6 md:w-8 flex justify-center"><div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>` : `<span class="${isActive ? 'text-white/90' : 'text-white/40'} font-bold text-xs md:text-sm w-6 md:w-8 text-center">${idx + 1}</span>`;
                 
-                row.innerHTML = `<div class="flex items-center gap-2 md:gap-4 flex-1 overflow-hidden" onclick="playSong('${s.id}')">${indexOrVisualizer}${coverHtml}<div class="overflow-hidden pl-1 md:pl-2"><h4 class="font-bold text-sm md:text-base tracking-wide better-text-shadow truncate transition-all duration-300 ${isActive ? 'text-white text-[0.95rem] md:text-[1.1rem] font-extrabold glow-text' : 'text-white/90 group-hover:text-white'}">${s.title}</h4><p class="${isActive ? 'text-white/90' : 'text-white/50'} font-medium text-xs md:text-sm truncate mt-0.5">${s.artist}</p></div></div><div class="flex items-center gap-1 md:gap-2 pr-1 md:pr-3"><button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-4 h-4 md:w-5 md:h-5 ${isFav(s.id) ? 'fav-active text-rose-400 fill-rose-400' : 'text-white/40 hover:text-white'}"></i></button><button onclick="openMenu(event, '${s.id}')" class="p-2 shrink-0 ${isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white'} transition hover:scale-110"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button></div>`;
+                row.innerHTML = `<div class="flex items-center gap-2 md:gap-4 flex-1 overflow-hidden" onclick="playSong('${s.id}')">${indexOrVisualizer}${coverHtml}<div class="overflow-hidden pl-1 md:pl-2"><h4 class="font-bold text-sm md:text-base tracking-wide better-text-shadow truncate transition-all duration-300 ${isActive ? 'text-white text-[0.95rem] md:text-[1.1rem] font-extrabold glow-text' : 'text-white/90 group-hover:text-white'}">${s.title}</h4><p class="${isActive ? 'text-white/90' : 'text-white/50'} font-medium text-xs md:text-sm truncate mt-0.5">${s.artist}</p></div></div><div class="flex items-center gap-1 md:gap-2 pr-1 md:pr-3"><button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-4 h-4 md:w-5 md:h-5 ${isFav(s.id) ? 'fav-active text-rose-400 fill-rose-400' : 'text-white/30 hover:text-white'}"></i></button><button onclick="openMenu(event, '${s.id}')" class="p-2 shrink-0 ${isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white'} transition hover:scale-110"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button></div>`;
                 listEl.appendChild(row);
             });
             lucide.createIcons();
@@ -1302,11 +1303,20 @@
         let ytPlayerReadyState = false;
         let queuedYtVideoObj = null;
 
-        // INVISIBLE YOUTUBE INIT (Trick Browser Throttling)
+        // INVISIBLE YOUTUBE INIT (Trick Browser Throttling & AD-SHIELD)
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('yt-player-container', {
-                height: '200', width: '200', // Trick the browser into thinking it's a real video
-                playerVars: { 'autoplay': 1, 'controls': 0, 'playsinline': 1, 'origin': window.location.origin },
+                height: '40', width: '40', // Tiny but technical enough to prevent speed throttling
+                host: 'https://www.youtube-nocookie.com', // 🛡️ AD-SHIELD: Blocks tracking cookies/ads
+                playerVars: { 
+                    'autoplay': 1, 
+                    'controls': 0, 
+                    'playsinline': 1, 
+                    'origin': window.location.origin,
+                    'iv_load_policy': 3, // Skip annotations/prompts
+                    'modestbranding': 1, // Remove logo triggers
+                    'rel': 0 // Don't show related videos (ad triggers)
+                },
                 events: { 
                     'onReady': () => {
                         ytPlayerReadyState = true;
