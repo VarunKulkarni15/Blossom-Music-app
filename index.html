@@ -82,7 +82,7 @@
         @keyframes bounce { 0% { height: 4px; } 100% { height: 16px; } }
 
         /* Splash Screen Cinematic Animations */
-        #splashScreen { transition: opacity 0.8s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.8s; z-index: 100; overflow: hidden; }
+        #splashScreen { transition: opacity 0.8s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.8s; z-index: 200; overflow: hidden; }
         .splash-bg-anim { animation: splash-zoom 4s ease-out forwards; }
         @keyframes splash-zoom { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
         .splash-logo-container { animation: splash-logo-enter 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: scale(0.2) rotate(-15deg); filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.1)); }
@@ -150,6 +150,47 @@
             <p class="text-white/60 text-sm font-medium mb-8">What should we call you?</p>
             <input type="text" id="nameInput" placeholder="Your Name" class="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white mb-6 focus:outline-none focus:border-rose-400 focus:bg-black/60 transition-all font-bold text-center text-lg shadow-inner placeholder-white/20" onkeypress="if(event.key === 'Enter') document.getElementById('saveNameBtn').click()">
             <button id="saveNameBtn" class="w-full py-4 rounded-xl active-gradient text-white font-bold text-lg btn-anim shadow-lg">Start Listening</button>
+        </div>
+    </div>
+
+    <!-- Spotlight Overlay (FIXED POSITIONING) -->
+    <div id="tutorialOverlay" class="fixed inset-0 z-[150] hidden opacity-0 transition-opacity duration-1000 bg-black/80 backdrop-blur-[2px] pointer-events-auto">
+        <!-- The Focus Area wraps directly over the shield button coordinates -->
+        <div id="tutorialFocusArea" class="absolute flex flex-col items-center justify-center" style="transition: all 0.3s ease;">
+            
+            <!-- The Bouncing Text perfectly glued above the button -->
+            <div id="tutorialTooltip" class="absolute bottom-full mb-3 flex flex-col items-center animate-bounce w-max pointer-events-none">
+                <div class="bg-rose-500 text-white text-xs md:text-sm font-bold px-4 py-2 rounded-xl shadow-xl mb-1 relative text-center tracking-wide">
+                    Quick update! Click here<br>to see our privacy info.
+                    <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-rose-500 rotate-45"></div>
+                </div>
+                <i data-lucide="arrow-down" class="w-5 h-5 text-rose-400"></i>
+            </div>
+
+            <!-- The Fake Shield Button -->
+            <button class="w-full h-full rounded-full bg-rose-500/20 border-2 border-rose-500 text-white flex items-center justify-center shadow-[0_0_30px_rgba(244,63,94,0.6)] animate-pulse" onclick="openDisclaimerFromTutorial()">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Project Disclaimer Modal (Cover Your Assets) -->
+    <div id="disclaimerModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[120] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-[2rem] p-6 md:p-8 w-full max-w-md flex flex-col border border-white/10 shadow-2xl relative">
+            <button class="close-modal-btn absolute top-5 right-5 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <div class="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0 shadow-inner">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white tracking-wide">Project Disclaimer</h2>
+            </div>
+            
+            <div class="space-y-4 text-white/70 text-sm leading-relaxed mb-8">
+                <p><strong class="text-white">🎓 Educational Project:</strong> Blossom is a non-commercial, college portfolio project. We are not affiliated, associated, or endorsed by JioSaavn, Apple, or any other third-party entity.</p>
+                <p><strong class="text-white">🔒 100% Private:</strong> We believe in absolute privacy. This app requires zero sign-ups, and we do not track, collect, or store any of your personal data on external servers. Everything stays securely on your device.</p>
+            </div>
+            
+            <button class="close-modal-btn w-full py-3.5 rounded-xl active-gradient text-white font-bold text-base btn-anim shadow-lg transition-colors">I Understand</button>
         </div>
     </div>
 
@@ -334,10 +375,19 @@
                         <i data-lucide="message-square" class="w-4 h-4"></i> <span class="text-sm">Send Feedback</span>
                     </button>
 
-                    <p class="text-[10px] uppercase tracking-[0.2em] text-white/30 mb-3 font-semibold px-1">Created by Varun Kulkarni</p>
-                    <div class="flex gap-4 px-1">
-                        <a href="https://www.instagram.com/varun_kulkarni__/" target="_blank" class="text-white/40 hover:text-white btn-anim"><i data-lucide="instagram" class="w-5 h-5"></i></a>
-                        <a href="https://github.com/VarunKulkarni15" target="_blank" class="text-white/40 hover:text-white btn-anim"><i data-lucide="github" class="w-5 h-5"></i></a>
+                    <!-- ADDED: The Privacy Shield Button next to your name -->
+                    <div class="flex items-center justify-between px-1">
+                        <div class="flex flex-col">
+                            <p class="text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2 font-semibold">Created by Varun Kulkarni</p>
+                            <div class="flex gap-4">
+                                <a href="https://www.instagram.com/varun_kulkarni__/" target="_blank" class="text-white/40 hover:text-white btn-anim"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                                <a href="https://github.com/VarunKulkarni15" target="_blank" class="text-white/40 hover:text-white btn-anim"><i data-lucide="github" class="w-4 h-4"></i></a>
+                            </div>
+                        </div>
+                        <!-- The Permanent Privacy Shield Button -->
+                        <button id="privacyShieldBtn" onclick="openDisclaimer()" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all btn-anim shadow-sm ml-2 shrink-0" title="Privacy & Disclaimer">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        </button>
                     </div>
                 </div>
             </aside>
@@ -503,6 +553,61 @@
             }, 800);
         }, 3500);
 
+        // --- THE ONBOARDING SPOTLIGHT TUTORIAL (FIXED) ---
+        function checkAndShowSpotlight() {
+            // Check if they've ever seen it before
+            if (!localStorage.getItem('blossomDisclaimerSeen')) {
+                setTimeout(() => {
+                    // Step 1: If on mobile, force the sidebar open so they can see the button
+                    if (window.innerWidth < 768) {
+                        toggleSidebar();
+                    }
+                    
+                    // Step 2: Wait 500ms for sidebar to slide in, then position and show the spotlight
+                    setTimeout(() => {
+                        const overlay = document.getElementById('tutorialOverlay');
+                        const realBtn = document.getElementById('privacyShieldBtn');
+                        const focusArea = document.getElementById('tutorialFocusArea');
+                        
+                        // Grab EXACT coordinates of the real shield button
+                        const rect = realBtn.getBoundingClientRect();
+                        
+                        // Place the focus wrapper exactly over the real button
+                        focusArea.style.top = rect.top + 'px';
+                        focusArea.style.left = rect.left + 'px';
+                        focusArea.style.width = rect.width + 'px';
+                        focusArea.style.height = rect.height + 'px';
+                        
+                        // Fade in the dark overlay!
+                        overlay.style.display = 'block';
+                        void overlay.offsetWidth; 
+                        overlay.classList.replace('opacity-0', 'opacity-100');
+                    }, 500); 
+                }, 2000); 
+            }
+        }
+
+        window.openDisclaimerFromTutorial = function() {
+            const overlay = document.getElementById('tutorialOverlay');
+            // Fade out the spotlight
+            overlay.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => { 
+                overlay.style.display = 'none'; 
+                overlay.classList.add('hidden'); 
+            }, 1000);
+            
+            // Save the memory so they never see it again
+            localStorage.setItem('blossomDisclaimerSeen', 'true');
+            
+            // Open the actual disclaimer modal
+            openDisclaimer();
+        }
+
+        window.openDisclaimer = function() {
+            if (window.innerWidth < 768) toggleSidebar(true); // Auto-hide sidebar on mobile
+            showModal('disclaimerModal');
+        }
+
         // --- DATA STATE & PERSISTENCE ---
         let cloudSongs = []; 
         let library = JSON.parse(localStorage.getItem('blossomLibrary')) || []; 
@@ -537,6 +642,7 @@
                 showModal('nameModal');
             } else {
                 updateGreeting();
+                checkAndShowSpotlight(); // Trigger spotlight for old users
             }
         }
 
@@ -547,6 +653,7 @@
                 localStorage.setItem('blossomName', userName);
                 hideModals();
                 updateGreeting();
+                checkAndShowSpotlight(); // Trigger spotlight for new users
             }
         };
 
@@ -689,7 +796,8 @@
             setTimeout(() => m.classList.replace('opacity-0', 'opacity-100'), 10);
         }
         function hideModals() {
-            document.querySelectorAll('.fixed.z-\\[60\\], .fixed.z-\\[70\\], .fixed.z-\\[80\\], .fixed.z-\\[110\\]').forEach(m => {
+            // UPDATED to include the disclaimerModal z-index
+            document.querySelectorAll('.fixed.z-\\[60\\], .fixed.z-\\[70\\], .fixed.z-\\[80\\], .fixed.z-\\[110\\], .fixed.z-\\[120\\]').forEach(m => {
                 m.classList.replace('opacity-100', 'opacity-0');
                 setTimeout(() => { m.style.display = 'none'; m.classList.add('hidden'); }, 300);
             });
@@ -745,7 +853,7 @@
                 mainHeaderTitle.innerText = "Explore";
                 searchBox.style.display = "flex";
                 if(cloudSongs.length === 0) {
-                    document.getElementById('songList').innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/20"><i data-lucide="cloud-search" class="w-16 h-16 md:w-20 md:h-20 mb-4 opacity-20"></i><p class="italic text-base md:text-lg font-medium">Search for an artist or song.</p></div>`;
+                    document.getElementById('songList').innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/20"><i data-lucide="cloud-search" class="w-16 h-16 md:w-20 md:h-20 mb-4 opacity-20"></i><p class="italic text-base md:text-lg font-medium text-center">Search for an artist or song.</p></div>`;
                     lucide.createIcons();
                 }
             } else {
@@ -1168,6 +1276,7 @@
         const playIcon = document.getElementById('playIcon');
         const fsPlayIcon = document.getElementById('fsPlayIcon');
 
+        // DO NOT CHANGE: Using the user's original working code for playback
         window.playSong = function(id) {
             activeSongId = id; 
             let s = getRenderedSongs().find(x => x.id === id);
@@ -1189,6 +1298,7 @@
             renderList();
         }
 
+        // DO NOT CHANGE: Using the user's original working UI updater
         function updatePlayerUI() {
             const s = activeSongId ? getRenderedSongs().find(x => x.id === activeSongId) || library.find(x => x.id === activeSongId) || lastPlayed : lastPlayed;
             if(!s) return;
@@ -1320,7 +1430,7 @@
             }, 600);
         }
 
-        // --- KEYBOARD SHORTCUTS ---
+        // --- KEYBOARD SHORTCUTS (DO NOT CHANGE) ---
         window.addEventListener('keydown', (e) => {
             if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') return;
 
