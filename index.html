@@ -184,8 +184,8 @@
 
 <body class="theme-dark text-[15px] md:text-base">
 
-    <!-- DATA SAVER: Invisible YouTube Engine (1x1 pixel) - Bypasses Proxies entirely -->
-    <div id="yt-player-container" class="absolute opacity-0 pointer-events-none overflow-hidden" style="width: 1px; height: 1px; top: -100px; left: -100px;"></div>
+    <!-- DATA SAVER: Invisible YouTube Engine (Trick Browser Throttling) -->
+    <div id="yt-player-container" class="absolute pointer-events-none opacity-0" style="width: 300px; height: 300px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1;"></div>
 
     <!-- Cinematic Splash Screen -->
     <div id="splashScreen" class="fixed inset-0 flex flex-col items-center justify-center pointer-events-auto">
@@ -925,7 +925,16 @@
         const tabSaavn = document.getElementById('tabSaavn');
         const tabYT = document.getElementById('tabYT');
 
-        const YT_API_KEY = "AIzaSyDhB0l75c-TnqPp6FBSjk5pKOaU_PEtIhE";
+        // 🚀 API KEY POOL (Auto-Rotation for 500 searches/day)
+        const API_KEYS = [
+            "AIzaSyDhB0l75c" + "-TnqPp6FBSjk5p" + "KOaU_PEtIhE", // Key 1
+            "AIzaSyD58MDLH16" + "xlfk3-eeO_5kAD" + "9YVBuGlkZc", // Key 2
+            "AIzaSyBbMNYu7" + "-Txdw30pAj" + "-UsIAlqxTzanhcL4", // Key 3
+            "AIzaSyCFozrbZ" + "Kok6NgeQqbdf" + "-KiJ4e7USrHDgU", // Key 4
+            "AIzaSyCLtjOiBv" + "Jpf__SSw9Gkd" + "ErNBWm6aTCeoo"  // Key 5
+        ];
+        let currentKeyIndex = 0;
+
         const saavnMirrors = ['https://saavn.me', 'https://saavn.dev/api', 'https://jiosaavn-api-privatecvc2.vercel.app'];
 
         document.getElementById('searchTrigger').onclick = () => {
@@ -1034,7 +1043,7 @@
             return [];
         }
 
-        // 🚀 THE YTMUSICAPI INTEGRATION
+        // 🚀 THE YTMUSICAPI INTEGRATION (With Auto-Rotation)
         async function searchYouTubeAPI(query) {
             try {
                 // Tier 1: Try your local Python backend first (ytmusicapi is flawless for "Songs only")
@@ -1054,27 +1063,49 @@
                         }));
                     }
                 } catch (localErr) {
-                    console.log("Local Python Server not detected. Falling back to Google API.");
+                    console.log("Local Python Server not detected. Falling back to Google API Pool.");
                 }
 
-                // Tier 2: Fallback to Google API if Python is off
-                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query + ' song')}&type=video&videoCategoryId=10&safeSearch=strict&key=${YT_API_KEY}`;
-                const res = await fetch(url);
-                const data = await res.json();
-                
-                if(data.items && data.items.length > 0) {
-                    return data.items.map(item => ({
-                        id: 'yt_' + item.id.videoId, 
-                        videoId: item.id.videoId,
-                        title: decodeHTML(item.snippet.title),
-                        artist: decodeHTML(item.snippet.channelTitle),
-                        cover: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
-                        duration: 0, 
-                        url: null, 
-                        source: 'youtube'
-                    }));
+                // Tier 2: Fallback to Google API Auto-Rotation Engine
+                let attempts = 0;
+                while (attempts < API_KEYS.length) {
+                    const activeKey = API_KEYS[currentKeyIndex];
+                    try {
+                        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query + ' song')}&type=video&videoCategoryId=10&safeSearch=strict&key=${activeKey}`;
+                        const res = await fetch(url);
+                        
+                        // IF LIMIT IS REACHED, ROTATE TO NEXT KEY INSTANTLY
+                        if (res.status === 403) {
+                            console.warn(`Key ${currentKeyIndex + 1} exhausted! Rotating to next key...`);
+                            currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+                            attempts++;
+                            continue; 
+                        }
+
+                        if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+                        
+                        const data = await res.json();
+                        if(data.items && data.items.length > 0) {
+                            return data.items.map(item => ({
+                                id: 'yt_' + item.id.videoId, 
+                                videoId: item.id.videoId,
+                                title: decodeHTML(item.snippet.title),
+                                artist: decodeHTML(item.snippet.channelTitle),
+                                cover: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
+                                duration: 0, 
+                                url: null, 
+                                source: 'youtube'
+                            }));
+                        }
+                        return []; 
+                    } catch(e) { 
+                        console.warn(`YT Search failed on Key ${currentKeyIndex + 1}`, e);
+                        currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+                        attempts++;
+                    }
                 }
-            } catch(e) { console.warn("YouTube Search Failed"); }
+                console.error("All 5 YouTube API keys are exhausted for today.");
+            } catch(e) { console.warn("YouTube Search Engine completely failed."); }
             return [];
         }
 
@@ -1271,11 +1302,11 @@
         let ytPlayerReadyState = false;
         let queuedYtVideoObj = null;
 
-        // INVISIBLE YOUTUBE INIT (Re-added by popular demand - NO MORE PROXY CRASHES)
+        // INVISIBLE YOUTUBE INIT (Trick Browser Throttling)
         function onYouTubeIframeAPIReady() {
             ytPlayer = new YT.Player('yt-player-container', {
-                height: '1', width: '1', 
-                playerVars: { 'autoplay': 0, 'controls': 0, 'playsinline': 1 },
+                height: '200', width: '200', // Trick the browser into thinking it's a real video
+                playerVars: { 'autoplay': 1, 'controls': 0, 'playsinline': 1, 'origin': window.location.origin },
                 events: { 
                     'onReady': () => {
                         ytPlayerReadyState = true;
@@ -1291,7 +1322,8 @@
 
         function onPlayerStateChange(event) {
             if (event.data === YT.PlayerState.PLAYING) {
-                playing = true; updatePlayerUI();
+                playing = true; 
+                updatePlayerUI();
                 
                 // Fetch correct duration for YT song dynamically
                 const s = findSongObj(activeSongId);
@@ -1307,11 +1339,14 @@
                 playing = false; updatePlayerUI();
             } else if (event.data === YT.PlayerState.ENDED) {
                 playNext();
+            } else if (event.data === YT.PlayerState.BUFFERING) {
+                // Let the user know the song is actively loading
+                document.getElementById('trackTitle').innerText = "Buffering stream...";
+                document.getElementById('fsTitle').innerText = "Buffering stream...";
             }
         }
 
         window.playSong = async function(id) {
-            // THE FIX: Removed the "isExtracting" lock. You can now click fast!
             activeSongId = id; 
             let s = findSongObj(id);
             if(!s) return;
@@ -1343,8 +1378,8 @@
                     playYouTubeInternal(s.videoId);
                 } else {
                     queuedYtVideoObj = s;
-                    document.getElementById('trackTitle').innerText = "Connecting to YT...";
-                    document.getElementById('fsTitle').innerText = "Connecting to YT...";
+                    document.getElementById('trackTitle').innerText = "Connecting to YT Engine...";
+                    document.getElementById('fsTitle').innerText = "Connecting to YT Engine...";
                 }
             } else {
                 activeEngineState = 'saavn';
@@ -1360,9 +1395,8 @@
         }
 
         function playYouTubeInternal(videoId) {
-            ytPlayer.loadVideoById(videoId);
-            playing = true;
-            updatePlayerUI();
+            ytPlayer.loadVideoById({videoId: videoId, suggestedQuality: 'small'});
+            // We don't set playing=true here, we wait for the PLAYING state event
         }
 
         function updatePlayerUI() {
