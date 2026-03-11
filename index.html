@@ -65,7 +65,9 @@
         body.theme-pink .text-white\/50 { color: rgba(255, 255, 255, 0.7) !important; }
         
         body.theme-pink .item-glass:hover:not(.active-gradient) { background: rgba(255, 255, 255, 0.15) !important; border-color: rgba(255, 255, 255, 0.3) !important; transform: translateX(5px); }
-        body.theme-pink .petal { position: absolute; background-color: rgba(255, 200, 210, 0.6); border-radius: 150% 0 150% 0; animation: fall linear infinite; pointer-events: none; z-index: 1; display: block; }
+        
+        /* PETAL FIX: Made slightly softer so it never obscures text or UI */
+        body.theme-pink .petal { position: absolute; background-color: rgba(255, 200, 210, 0.45); border-radius: 150% 0 150% 0; animation: fall linear infinite; pointer-events: none; z-index: 0; display: block; }
 
         /* Animations & Utilities */
         @keyframes ambientGlow { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
@@ -153,12 +155,9 @@
         </div>
     </div>
 
-    <!-- The PUBG-Style Spotlight Overlay (FIXED POSITIONING) -->
+    <!-- Spotlight Overlay -->
     <div id="tutorialOverlay" class="fixed inset-0 z-[150] hidden opacity-0 transition-opacity duration-1000 bg-black/80 backdrop-blur-[2px] pointer-events-auto">
-        <!-- The Focus Area wraps directly over the shield button coordinates -->
         <div id="tutorialFocusArea" class="absolute flex flex-col items-center justify-center" style="transition: all 0.3s ease;">
-            
-            <!-- The Bouncing Text perfectly glued above the button -->
             <div id="tutorialTooltip" class="absolute bottom-full mb-3 flex flex-col items-center animate-bounce w-max pointer-events-none">
                 <div class="bg-rose-500 text-white text-xs md:text-sm font-bold px-4 py-2 rounded-xl shadow-xl mb-1 relative text-center tracking-wide">
                     Quick update! Click here<br>to see our privacy info.
@@ -166,15 +165,13 @@
                 </div>
                 <i data-lucide="arrow-down" class="w-5 h-5 text-rose-400"></i>
             </div>
-
-            <!-- The Fake Shield Button -->
             <button class="w-full h-full rounded-full bg-rose-500/20 border-2 border-rose-500 text-white flex items-center justify-center shadow-[0_0_30px_rgba(244,63,94,0.6)] animate-pulse" onclick="openDisclaimerFromTutorial()">
                 <i data-lucide="shield-check" class="w-5 h-5"></i>
             </button>
         </div>
     </div>
 
-    <!-- Project Disclaimer Modal (Cover Your Assets) -->
+    <!-- Project Disclaimer Modal -->
     <div id="disclaimerModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[120] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
         <div class="app-glass rounded-[2rem] p-6 md:p-8 w-full max-w-md flex flex-col border border-white/10 shadow-2xl relative">
             <button class="close-modal-btn absolute top-5 right-5 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -194,7 +191,7 @@
         </div>
     </div>
 
-    <!-- Feedback Modal (Discord Integration) -->
+    <!-- Feedback Modal -->
     <div id="feedbackModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[80] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
         <div class="app-glass rounded-[2rem] p-6 md:p-8 w-full max-w-md flex flex-col relative border border-white/10 shadow-2xl">
             <button class="close-modal-btn absolute top-5 right-5 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -334,19 +331,21 @@
         </div>
     </div>
 
-    <!-- Background Petals -->
-    <div id="petals-container" class="absolute inset-0 z-0 overflow-hidden pointer-events-none"></div>
-
     <!-- Main App Container (Responsive) -->
     <div class="app-glass w-full h-full md:w-[95vw] md:h-[85vh] md:max-w-6xl md:rounded-[2.5rem] relative flex flex-col overflow-hidden z-10 md:shadow-2xl">
-        <div class="flex flex-1 overflow-hidden relative">
+        
+        <!-- PETAL FIX: Moved inside the app glass so they aren't hidden by the strong mobile blur! -->
+        <!-- They stay safely at z-0 so they never obscure buttons or posters. -->
+        <div id="petals-container" class="absolute inset-0 z-0 overflow-hidden pointer-events-none"></div>
+
+        <!-- UI wrapped in z-10 to stay safely above the falling petals -->
+        <div class="flex flex-1 overflow-hidden relative z-10">
             
-            <!-- Sidebar Mobile Overlay (Moved inside flex container for perfect stacking) -->
+            <!-- Sidebar Mobile Overlay -->
             <div id="sidebarOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden opacity-0 transition-opacity duration-300"></div>
 
-            <!-- Sidebar (Responsive: Slides in on mobile, fixed on desktop) -->
+            <!-- Sidebar -->
             <aside id="sidebar" class="w-64 shrink-0 panel-glass flex flex-col py-8 px-4 z-50 absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 bg-[#050508]/95 md:bg-transparent backdrop-blur-3xl md:backdrop-blur-none border-r border-white/10 md:border-none">
-                <!-- Close Sidebar Button (Mobile Only) -->
                 <button id="closeSidebarBtn" class="md:hidden absolute top-6 right-4 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
 
                 <div class="flex items-center gap-3 mb-10 px-2">
@@ -375,7 +374,6 @@
                         <i data-lucide="message-square" class="w-4 h-4"></i> <span class="text-sm">Send Feedback</span>
                     </button>
 
-                    <!-- ADDED: The Privacy Shield Button next to your name -->
                     <div class="flex items-center justify-between px-1">
                         <div class="flex flex-col">
                             <p class="text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2 font-semibold">Created by Varun Kulkarni</p>
@@ -384,7 +382,6 @@
                                 <a href="https://github.com/VarunKulkarni15" target="_blank" class="text-white/40 hover:text-white btn-anim"><i data-lucide="github" class="w-4 h-4"></i></a>
                             </div>
                         </div>
-                        <!-- The Permanent Privacy Shield Button -->
                         <button id="privacyShieldBtn" onclick="openDisclaimer()" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all btn-anim shadow-sm ml-2 shrink-0" title="Privacy & Disclaimer">
                             <i data-lucide="shield-check" class="w-5 h-5"></i>
                         </button>
@@ -396,7 +393,6 @@
             <main class="flex-1 flex flex-col p-4 md:p-10 overflow-hidden relative w-full">
                 <header class="flex justify-between items-start mb-6 md:mb-8 shrink-0 z-20">
                     <div class="flex flex-col">
-                        <!-- Mobile Hamburger + Greeting -->
                         <div class="flex items-center gap-3 mb-1">
                             <button id="openSidebarBtn" class="md:hidden text-white/70 hover:text-white transition"><i data-lucide="menu" class="w-6 h-6"></i></button>
                             <p id="greetingText" class="text-white/60 font-medium text-xs md:text-sm tracking-wide">Good evening ✨</p>
@@ -433,7 +429,6 @@
         <!-- Responsive Footer Player -->
         <footer class="h-20 md:h-28 panel-glass border-t border-white/10 px-4 md:px-8 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.4)] z-30 relative group">
             
-            <!-- Mobile Progress Bar (Absolute Top of Footer) -->
             <input type="range" id="mobileProgress" class="md:hidden absolute top-0 left-0 w-full h-[3px] bg-white/10 accent-rose-400 appearance-none cursor-pointer z-40 m-0 p-0" value="0" style="transform: translateY(-50%);">
 
             <div class="flex items-center gap-3 md:gap-5 w-1/2 md:w-1/3">
@@ -474,7 +469,7 @@
     </div>
 
     <!-- =========================================
-         THE ULTIMATE FLEX: CINEMATIC FULL SCREEN (Responsive)
+         THE ULTIMATE FLEX: CINEMATIC FULL SCREEN
          ========================================= -->
     <div id="fullScreenPlayer" class="fixed inset-0 z-[100] bg-black hidden flex-col translate-y-full">
         <!-- Blurred Background -->
@@ -492,10 +487,9 @@
             <button onclick="openInfoModal()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white transition-all btn-anim backdrop-blur-md border border-white/10"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button>
         </div>
 
-        <!-- Main Content (Responsive) -->
+        <!-- Main Content -->
         <div class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 md:p-8 w-full max-w-4xl mx-auto min-h-0">
             
-            <!-- Dynamic Album Art sizing based on Viewport Height -->
             <div class="w-[65vw] h-[65vw] max-w-[350px] max-h-[350px] md:w-[45vh] md:h-[45vh] md:max-w-[500px] md:max-h-[500px] rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/20 mb-6 md:mb-10 bg-black/40 flex items-center justify-center relative shrink-0">
                 <img id="fsArt" src="" class="w-full h-full object-cover hidden absolute inset-0 z-10">
                 <div id="fsFallback" class="absolute inset-0 flex items-center justify-center z-0 text-6xl md:text-7xl filter drop-shadow-2xl hidden">🌸</div>
@@ -508,17 +502,16 @@
             
             <!-- Beautiful Big Playback Controls -->
             <div class="w-full max-w-2xl mt-6 md:mt-12 flex flex-col items-center shrink-0 px-2 md:px-0">
-                <!-- Large Progress Bar -->
                 <div class="w-full flex items-center gap-3 md:gap-5 text-xs md:text-sm text-white/60 font-medium mb-6 md:mb-10">
                     <span id="fsCurrTime" class="w-10 text-right">0:00</span>
                     <input type="range" id="fsProgress" class="flex-1 accent-white h-1.5 md:h-2 bg-white/20 rounded-full cursor-pointer outline-none transition-all" value="0">
                     <span id="fsTotalTime" class="w-10">0:00</span>
                 </div>
                 
-                <!-- Main Buttons -->
                 <div class="flex items-center gap-8 md:gap-12">
                     <button onclick="playPrev()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-back" class="w-8 h-8 md:w-10 md:h-10 fill-current"></i></button>
                     
+                    <!-- BULLETPROOF PLAY BUTTON (Full Screen) -->
                     <button onclick="togglePlay()" id="fsPlayBtn" class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white text-black flex items-center justify-center btn-anim hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.3)] md:shadow-[0_0_40px_rgba(255,255,255,0.4)]">
                         <i data-lucide="play" id="fsPlayIcon" class="w-8 h-8 md:w-12 md:h-12 fill-current translate-x-1"></i>
                         <i data-lucide="pause" id="fsPauseIcon" class="w-8 h-8 md:w-12 md:h-12 fill-current hidden"></i>
@@ -554,32 +547,24 @@
             }, 800);
         }, 3500);
 
-        // --- THE ONBOARDING SPOTLIGHT TUTORIAL (FIXED) ---
+        // --- 🛡️ THE FIXED PUBG-STYLE TUTORIAL LOGIC ---
         function checkAndShowSpotlight() {
-            // Check if they've ever seen it before
             if (!localStorage.getItem('blossomDisclaimerSeen')) {
                 setTimeout(() => {
-                    // Step 1: If on mobile, force the sidebar open so they can see the button
                     if (window.innerWidth < 768) {
                         toggleSidebar();
                     }
-                    
-                    // Step 2: Wait 500ms for sidebar to slide in, then position and show the spotlight
                     setTimeout(() => {
                         const overlay = document.getElementById('tutorialOverlay');
                         const realBtn = document.getElementById('privacyShieldBtn');
                         const focusArea = document.getElementById('tutorialFocusArea');
                         
-                        // Grab EXACT coordinates of the real shield button
                         const rect = realBtn.getBoundingClientRect();
-                        
-                        // Place the focus wrapper exactly over the real button
                         focusArea.style.top = rect.top + 'px';
                         focusArea.style.left = rect.left + 'px';
                         focusArea.style.width = rect.width + 'px';
                         focusArea.style.height = rect.height + 'px';
                         
-                        // Fade in the dark overlay!
                         overlay.style.display = 'block';
                         void overlay.offsetWidth; 
                         overlay.classList.replace('opacity-0', 'opacity-100');
@@ -590,22 +575,18 @@
 
         window.openDisclaimerFromTutorial = function() {
             const overlay = document.getElementById('tutorialOverlay');
-            // Fade out the spotlight
             overlay.classList.replace('opacity-100', 'opacity-0');
             setTimeout(() => { 
                 overlay.style.display = 'none'; 
                 overlay.classList.add('hidden'); 
             }, 1000);
             
-            // Save the memory so they never see it again
             localStorage.setItem('blossomDisclaimerSeen', 'true');
-            
-            // Open the actual disclaimer modal
             openDisclaimer();
         }
 
         window.openDisclaimer = function() {
-            if (window.innerWidth < 768) toggleSidebar(true); // Auto-hide sidebar on mobile
+            if (window.innerWidth < 768) toggleSidebar(true);
             showModal('disclaimerModal');
         }
 
@@ -615,26 +596,57 @@
         let playlists = JSON.parse(localStorage.getItem('blossomPlaylists')) || {};
         let userName = localStorage.getItem('blossomName') || '';
         let lastPlayed = JSON.parse(localStorage.getItem('blossomLastPlayed')) || null;
+        let playHistory = JSON.parse(localStorage.getItem('blossomPlayHistory')) || [];
         
-        let playQueue = [];
+        if (lastPlayed && playHistory.length === 0) playHistory.push(lastPlayed);
+
+        let currentQueue = []; 
         let activeSongId = null;
         let playing = false;
         let currentView = 'home';
         let contextSongId = null;
+
+        let dashboardData = { artist: [], similar: [], trending: [] };
+        let isDashboardLoading = false;
 
         function saveLibrary() {
             localStorage.setItem('blossomLibrary', JSON.stringify(library));
             localStorage.setItem('blossomPlaylists', JSON.stringify(playlists));
         }
 
+        // --- DASHBOARD GHOST FETCH ---
+        async function loadDashboard() {
+            isDashboardLoading = true;
+            
+            if(currentView === 'home' && document.getElementById('searchInput').value.trim() === '') renderList(); 
+            
+            try {
+                if (playHistory.length === 0) {
+                    const tRes = await fetchMusicData("top hits").catch(()=>[]);
+                    dashboardData.trending = tRes.slice(0, 10);
+                } else {
+                    const anchorSong = playHistory[0]; 
+                    const [aRes, sRes] = await Promise.all([
+                        fetchMusicData(anchorSong.artist + " popular").catch(()=>[]),
+                        fetchMusicData(anchorSong.title + " " + anchorSong.artist).catch(()=>[])
+                    ]);
+                    
+                    dashboardData.artist = aRes.filter(x => x.id !== anchorSong.id).slice(0, 10);
+                    dashboardData.similar = sRes.filter(x => x.id !== anchorSong.id && !dashboardData.artist.find(a=>a.id===x.id)).slice(0, 10);
+                }
+            } catch(e) {}
+            
+            isDashboardLoading = false;
+            if(currentView === 'home' && document.getElementById('searchInput').value.trim() === '') renderList();
+        }
+        
+        setTimeout(loadDashboard, 2500); 
+
         // --- UNIQUE TAB VISIBILITY FEATURE ---
         let originalTitle = document.title;
         document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                document.title = "🥺 Hold up... come back!";
-            } else {
-                document.title = originalTitle;
-            }
+            if (document.hidden) document.title = "🥺 Hold up... come back!";
+            else document.title = originalTitle;
         });
 
         // --- NAME PROMPT & GREETING ---
@@ -643,7 +655,7 @@
                 showModal('nameModal');
             } else {
                 updateGreeting();
-                checkAndShowSpotlight(); // Trigger spotlight for old users
+                checkAndShowSpotlight(); 
             }
         }
 
@@ -654,7 +666,7 @@
                 localStorage.setItem('blossomName', userName);
                 hideModals();
                 updateGreeting();
-                checkAndShowSpotlight(); // Trigger spotlight for new users
+                checkAndShowSpotlight(); 
             }
         };
 
@@ -663,7 +675,6 @@
             let g = "Good evening";
             if (hour < 12) g = "Good morning";
             else if (hour < 18) g = "Good afternoon";
-            
             const nameStr = userName ? `, ${userName}` : "";
             document.getElementById('greetingText').innerText = `${g}${nameStr} ✨`;
         }
@@ -675,47 +686,25 @@
             const name = document.getElementById('feedbackName').value.trim() || 'Anonymous';
             const text = document.getElementById('feedbackText').value.trim();
             const btnText = document.getElementById('fbBtnText');
-
-            if (!text) {
-                alert("Please type a message first!");
-                return;
-            }
-
+            if (!text) { alert("Please type a message first!"); return; }
             btnText.innerText = "Sending...";
             
             const payload = {
                 username: "Blossom Feedback Bot",
                 avatar_url: "https://i.imgur.com/8N8y8oX.png",
                 embeds: [{
-                    title: "New App Feedback 🌸",
-                    color: 16737378,
-                    fields: [
-                        { name: "From User", value: name, inline: true },
-                        { name: "Device Info", value: navigator.platform, inline: true },
-                        { name: "Message", value: text }
-                    ],
-                    footer: { text: "Sent from Blossom Cloud Player" },
-                    timestamp: new Date().toISOString()
+                    title: "New App Feedback 🌸", color: 16737378,
+                    fields: [ { name: "From User", value: name, inline: true }, { name: "Device Info", value: navigator.platform, inline: true }, { name: "Message", value: text } ],
+                    footer: { text: "Sent from Blossom Cloud Player" }, timestamp: new Date().toISOString()
                 }]
             };
 
             try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
+                const response = await fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 if (response.ok) {
                     btnText.innerText = "Sent! ✨";
-                    setTimeout(() => {
-                        hideModals();
-                        document.getElementById('feedbackText').value = '';
-                        btnText.innerText = "Send to Discord";
-                    }, 2000);
-                } else {
-                    throw new Error("Discord API error");
-                }
+                    setTimeout(() => { hideModals(); document.getElementById('feedbackText').value = ''; btnText.innerText = "Send to Discord"; }, 2000);
+                } else { throw new Error("Discord API error"); }
             } catch (err) {
                 btnText.innerText = "Error sending";
                 setTimeout(() => btnText.innerText = "Send to Discord", 2000);
@@ -730,11 +719,8 @@
             document.body.className = themeName;
             localStorage.setItem('blossomTheme', themeName);
             document.querySelectorAll('.theme-select-btn').forEach(btn => {
-                if (btn.dataset.theme === themeName) {
-                    btn.classList.add('border-rose-400'); btn.classList.remove('border-white/10');
-                } else {
-                    btn.classList.remove('border-rose-400'); btn.classList.add('border-white/10');
-                }
+                if (btn.dataset.theme === themeName) { btn.classList.add('border-rose-400'); btn.classList.remove('border-white/10'); } 
+                else { btn.classList.remove('border-rose-400'); btn.classList.add('border-white/10'); }
             });
         }
 
@@ -742,24 +728,21 @@
             const currentTheme = document.body.className;
             if (window.innerWidth < 768) toggleSidebar(true);
             document.querySelectorAll('.theme-select-btn').forEach(btn => {
-                if (btn.dataset.theme === currentTheme) {
-                    btn.classList.add('border-rose-400'); btn.classList.remove('border-white/10');
-                } else {
-                    btn.classList.remove('border-rose-400'); btn.classList.add('border-white/10');
-                }
+                if (btn.dataset.theme === currentTheme) { btn.classList.add('border-rose-400'); btn.classList.remove('border-white/10'); } 
+                else { btn.classList.remove('border-rose-400'); btn.classList.add('border-white/10'); }
                 btn.onclick = () => applyThemeSelection(btn.dataset.theme);
             });
             showModal('settingsModal');
         };
 
+        // PETAL FIX: JS calculation adjusted slightly to fit its new internal container perfectly
         function startPetals() {
             const container = document.getElementById('petals-container');
             setInterval(() => {
-                const petal = document.createElement('div');
-                petal.className = 'petal';
+                const petal = document.createElement('div'); petal.className = 'petal';
                 const size = Math.random() * 8 + 6;
                 petal.style.width = size + 'px'; petal.style.height = size + 'px';
-                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.left = Math.random() * 100 + '%'; 
                 petal.style.setProperty('--drift', (Math.random() * 200 - 100) + 'px');
                 petal.style.animationDuration = (Math.random() * 5 + 5) + 's';
                 container.appendChild(petal);
@@ -792,12 +775,10 @@
         // --- MODAL UTILS ---
         function showModal(id) {
             const m = document.getElementById(id);
-            m.style.display = 'flex';
-            m.classList.remove('hidden');
+            m.style.display = 'flex'; m.classList.remove('hidden');
             setTimeout(() => m.classList.replace('opacity-0', 'opacity-100'), 10);
         }
         function hideModals() {
-            // UPDATED to include the disclaimerModal z-index
             document.querySelectorAll('.fixed.z-\\[60\\], .fixed.z-\\[70\\], .fixed.z-\\[80\\], .fixed.z-\\[110\\], .fixed.z-\\[120\\]').forEach(m => {
                 m.classList.replace('opacity-100', 'opacity-0');
                 setTimeout(() => { m.style.display = 'none'; m.classList.add('hidden'); }, 300);
@@ -823,6 +804,7 @@
         const mainHeaderTitle = document.getElementById('mainHeaderTitle');
         const playlistActions = document.getElementById('playlistActions');
         const searchBox = document.getElementById('searchBox');
+        const searchInput = document.getElementById('searchInput'); 
 
         document.getElementById('navHome').onclick = () => setView('home');
         document.getElementById('navFavs').onclick = () => setView('favs');
@@ -853,10 +835,6 @@
             if(viewStr === 'home') {
                 mainHeaderTitle.innerText = "Explore";
                 searchBox.style.display = "flex";
-                if(cloudSongs.length === 0) {
-                    document.getElementById('songList').innerHTML = `<div class="h-full flex flex-col items-center justify-center text-white/20"><i data-lucide="cloud-search" class="w-16 h-16 md:w-20 md:h-20 mb-4 opacity-20"></i><p class="italic text-base md:text-lg font-medium text-center">Search for an artist or song.</p></div>`;
-                    lucide.createIcons();
-                }
             } else {
                 searchBox.style.display = "none";
                 if(viewStr === 'favs') mainHeaderTitle.innerText = "Liked Songs";
@@ -934,7 +912,6 @@
         renderSidebarPlaylists(); 
 
         // --- BULLETPROOF GLOBAL SEARCH LOGIC ---
-        const searchInput = document.getElementById('searchInput');
         const searchLoader = document.getElementById('searchLoader');
 
         document.getElementById('searchTrigger').onclick = () => {
@@ -947,6 +924,13 @@
                 searchInput.classList.add('opacity-0', 'pointer-events-none');
             }
         };
+
+        searchInput.addEventListener('input', (e) => {
+            if (e.target.value.trim() === '' && currentView === 'home') {
+                cloudSongs = []; 
+                renderList(); 
+            }
+        });
 
         function decodeHTML(html) {
             if (!html) return 'Unknown';
@@ -973,44 +957,26 @@
                     const data = await res.json();
                     
                     let tracks = [];
-                    if (data.data && data.data.results) {
-                        tracks = data.data.results;
-                    } else if (data.results) {
-                        tracks = data.results;
-                    } else if (Array.isArray(data)) {
-                        tracks = data;
-                    }
+                    if (data.data && data.data.results) { tracks = data.data.results; } 
+                    else if (data.results) { tracks = data.results; } 
+                    else if (Array.isArray(data)) { tracks = data; }
 
                     if (tracks && tracks.length > 0) {
                         let mappedTracks = tracks.map(item => {
                             let audioUrl = '';
-                            if (Array.isArray(item.downloadUrl)) {
-                                audioUrl = item.downloadUrl[item.downloadUrl.length - 1]?.url || item.downloadUrl[item.downloadUrl.length - 1]?.link || '';
-                            } else if (typeof item.downloadUrl === 'string') {
-                                audioUrl = item.downloadUrl;
-                            } else if (item.media_url) {
-                                audioUrl = item.media_url;
-                            } else if (item.url && typeof item.url === 'string' && item.url.includes('.mp4')) {
-                                audioUrl = item.url;
-                            }
-
-                            if (audioUrl && audioUrl.startsWith('http://')) {
-                                audioUrl = audioUrl.replace('http://', 'https://');
-                            }
+                            if (Array.isArray(item.downloadUrl)) audioUrl = item.downloadUrl[item.downloadUrl.length - 1]?.url || item.downloadUrl[item.downloadUrl.length - 1]?.link || '';
+                            else if (typeof item.downloadUrl === 'string') audioUrl = item.downloadUrl;
+                            else if (item.media_url) audioUrl = item.media_url;
+                            else if (item.url && typeof item.url === 'string' && item.url.includes('.mp4')) audioUrl = item.url;
+                            if (audioUrl && audioUrl.startsWith('http://')) audioUrl = audioUrl.replace('http://', 'https://');
 
                             let imageUrl = '';
-                            if (Array.isArray(item.image)) {
-                                imageUrl = item.image[item.image.length - 1]?.url || item.image[item.image.length - 1]?.link || '';
-                            } else if (typeof item.image === 'string') {
-                                imageUrl = item.image;
-                            }
+                            if (Array.isArray(item.image)) imageUrl = item.image[item.image.length - 1]?.url || item.image[item.image.length - 1]?.link || '';
+                            else if (typeof item.image === 'string') imageUrl = item.image;
 
                             let artistName = 'Unknown Artist';
-                            if (typeof item.primaryArtists === 'string') {
-                                artistName = item.primaryArtists;
-                            } else if (item.artists && item.artists.primary && item.artists.primary.length > 0) {
-                                artistName = item.artists.primary.map(a => a.name).join(', ');
-                            }
+                            if (typeof item.primaryArtists === 'string') artistName = item.primaryArtists;
+                            else if (item.artists && item.artists.primary && item.artists.primary.length > 0) artistName = item.artists.primary.map(a => a.name).join(', ');
 
                             return {
                                 id: item.id || Math.random().toString(),
@@ -1022,35 +988,24 @@
                             };
                         }).filter(song => song.url && song.url.startsWith('http')); 
 
-                        if (mappedTracks.length > 0) {
-                            return mappedTracks;
-                        }
+                        if (mappedTracks.length > 0) return mappedTracks;
                     }
-                } catch (err) {
-                    console.warn(`Server ${url} failed, trying backup...`, err);
-                }
+                } catch (err) { console.warn(`Server ${url} failed, trying backup...`, err); }
             }
 
             try {
-                console.log("Servers blocked or empty. Falling back to Apple iTunes API...");
                 const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=40`);
                 const itunesData = await itunesRes.json();
-                
                 if (itunesData.results && itunesData.results.length > 0) {
                     return itunesData.results.map(item => {
                         return {
-                            id: item.trackId.toString(),
-                            title: item.trackName,
-                            artist: item.artistName,
+                            id: item.trackId.toString(), title: item.trackName, artist: item.artistName,
                             cover: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '600x600bb') : '', 
-                            duration: Math.floor(item.trackTimeMillis / 1000),
-                            url: item.previewUrl
+                            duration: Math.floor(item.trackTimeMillis / 1000), url: item.previewUrl
                         };
                     }).filter(song => song.url);
                 }
-            } catch (fallbackErr) {
-                console.error("Apple Fallback also failed.", fallbackErr);
-            }
+            } catch (fallbackErr) {}
 
             throw new Error("All servers are offline or blocked.");
         }
@@ -1067,12 +1022,11 @@
                     cloudSongs = await fetchMusicData(query);
                     renderList();
                 } catch (err) {
-                    console.error("API Error:", err);
                     document.getElementById('songList').innerHTML = `
                         <div class="h-full flex flex-col items-center justify-center text-rose-400 opacity-80 italic text-center px-8">
                             <i data-lucide="wifi-off" class="w-12 h-12 mb-3"></i>
                             <p class="font-bold text-lg">Connection Blocked</p>
-                            <p class="text-sm mt-2">1. The public servers might be asleep right now.<br>2. Your Adblocker or Browser is blocking the API.<br><b>(Try turning off Brave Shields or uBlock for 127.0.0.1)</b></p>
+                            <p class="text-sm mt-2">Check adblockers or API status.</p>
                         </div>`;
                     lucide.createIcons();
                 } finally {
@@ -1081,9 +1035,21 @@
             }
         });
 
+        // --- GLOBAL SONG FINDER ---
+        function findSongObj(id) {
+            let s = cloudSongs.find(x => x.id.toString() === id.toString()) 
+                 || library.find(x => x.id.toString() === id.toString())
+                 || playHistory.find(x => x.id.toString() === id.toString())
+                 || dashboardData.artist.find(x => x.id.toString() === id.toString())
+                 || dashboardData.similar.find(x => x.id.toString() === id.toString())
+                 || dashboardData.trending.find(x => x.id.toString() === id.toString());
+            if (!s && lastPlayed && lastPlayed.id.toString() === id.toString()) s = lastPlayed;
+            return s;
+        }
+
         // --- LIST RENDERING & LIKES ---
         function getRenderedSongs() {
-            if(currentView === 'home') return cloudSongs;
+            if(currentView === 'home') return cloudSongs; 
             if(currentView === 'favs') return library.filter(s => s.fav);
             if(currentView.startsWith('playlist:')) {
                 const pName = currentView.substring(9);
@@ -1093,31 +1059,97 @@
         }
 
         function isFav(id) {
-            const s = library.find(x => x.id === id);
+            const s = library.find(x => x.id.toString() === id.toString());
             return s ? s.fav : false;
         }
 
         window.toggleFav = function(e, id) {
             e.stopPropagation();
-            let songInLib = library.find(x => x.id === id);
+            let songInLib = library.find(x => x.id.toString() === id.toString());
             
             if (songInLib) {
                 songInLib.fav = !songInLib.fav;
             } else {
-                const cloudS = cloudSongs.find(x => x.id === id);
-                if(cloudS) {
-                    const newSong = {...cloudS, fav: true};
-                    library.push(newSong);
-                }
+                const s = findSongObj(id);
+                if(s) library.push({...s, fav: true});
             }
             saveLibrary();
             renderList();
             if(id === activeSongId) updatePlayerUI();
         };
 
+        function createCarousel(title, songsArray) {
+            if (!songsArray || songsArray.length === 0) return '';
+            
+            let html = `
+            <div class="mb-10 w-full">
+                <h3 class="text-white font-extrabold text-lg md:text-xl mb-4 tracking-wide better-text-shadow">${title}</h3>
+                <div class="flex overflow-x-auto hide-scrollbar gap-4 md:gap-6 pb-4 pt-1 px-1 -mx-1">
+            `;
+            
+            songsArray.forEach(s => {
+                const isActive = s.id.toString() === activeSongId?.toString();
+                const coverHtml = s.cover 
+                    ? `<img src="${s.cover}" class="w-full h-full object-cover relative z-10 transition-transform duration-500 group-hover:scale-110">` 
+                    : `<div class="w-full h-full bg-white/5 flex items-center justify-center relative z-10"><span class="text-3xl filter drop-shadow-md">🌸</span></div>`;
+                
+                const overlay = isActive && playing 
+                    ? `<div class="absolute inset-0 bg-black/60 z-20 flex items-center justify-center backdrop-blur-[2px]"><div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>` 
+                    : `<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 z-20 flex items-center justify-center transition-opacity duration-300"><i data-lucide="play" class="w-10 h-10 text-white fill-current translate-x-0.5"></i></div>`;
+
+                html += `
+                    <div class="min-w-[140px] w-[140px] md:min-w-[170px] md:w-[170px] flex flex-col group cursor-pointer shrink-0" onclick="playSong('${s.id}')">
+                        <div class="w-full aspect-square rounded-2xl md:rounded-3xl overflow-hidden relative shadow-lg mb-3 border border-white/5 transition-all">
+                            ${overlay}
+                            ${coverHtml}
+                        </div>
+                        <h4 class="text-white font-bold text-[13px] md:text-[15px] truncate w-full better-text-shadow ${isActive ? 'text-rose-400' : 'group-hover:text-rose-400 transition-colors'}">${s.title}</h4>
+                        <p class="text-white/50 font-medium text-[11px] md:text-xs truncate w-full mt-0.5">${s.artist}</p>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+
         function renderList() {
             const listEl = document.getElementById('songList');
             listEl.innerHTML = '';
+            
+            if (currentView === 'home' && searchInput.value.trim() === '') {
+                let html = '';
+                
+                if (playHistory.length > 0) {
+                    html += createCarousel("Based on your last play", playHistory);
+                }
+                
+                if (isDashboardLoading) {
+                    html += `<div class="w-full flex flex-col items-center justify-center text-white/30 py-12"><div class="loader mb-4 border-t-rose-400"></div><p class="text-sm font-medium animate-pulse tracking-widest uppercase">Curating Dashboard...</p></div>`;
+                } else {
+                    if (playHistory.length === 0 && dashboardData.trending.length > 0) {
+                        html += createCarousel("Trending Right Now", dashboardData.trending);
+                    } else if (playHistory.length > 0) {
+                        if (dashboardData.artist.length > 0 && playHistory[0]) {
+                            html += createCarousel(`More from ${playHistory[0].artist}`, dashboardData.artist);
+                        }
+                        if (dashboardData.similar.length > 0) {
+                            html += createCarousel("You Might Also Like", dashboardData.similar);
+                        }
+                    }
+                }
+                
+                if (html === '') {
+                    html = `<div class="h-full flex flex-col items-center justify-center text-white/20">
+                                <i data-lucide="sparkles" class="w-16 h-16 md:w-20 md:h-20 mb-4 opacity-20"></i>
+                                <p class="italic text-base md:text-lg font-medium text-center">Search for a song to build your dashboard.</p>
+                            </div>`;
+                }
+                
+                listEl.innerHTML = html;
+                lucide.createIcons();
+                return; 
+            }
+
             const vs = getRenderedSongs();
 
             if(vs.length === 0) {
@@ -1128,7 +1160,7 @@
             }
 
             vs.forEach((s, idx) => {
-                const isActive = s.id === activeSongId;
+                const isActive = s.id.toString() === activeSongId?.toString();
                 const row = document.createElement('div');
                 row.className = `item-glass p-2 md:p-3 rounded-2xl flex items-center justify-between cursor-pointer group mb-1.5 ${isActive ? 'active-gradient shadow-lg' : 'bg-white/5 border-white/5'}`;
                 
@@ -1150,7 +1182,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-1 md:gap-2 pr-1 md:pr-3">
-                        <button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-4 h-4 md:w-5 md:h-5 ${isFav(s.id) ? 'fav-active' : (isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white')}"></i></button>
+                        <button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-4 h-4 md:w-5 md:h-5 ${isFav(s.id) ? 'fav-active text-rose-400 fill-rose-400' : 'text-white/40 hover:text-white'}"></i></button>
                         <button onclick="openMenu(event, '${s.id}')" class="p-2 shrink-0 ${isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white'} transition hover:scale-110"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button>
                     </div>`;
                 listEl.appendChild(row);
@@ -1158,13 +1190,10 @@
             lucide.createIcons();
         }
 
-        // --- CONTEXT MENU (3-DOTS) ---
         window.openMenu = function(e, id) {
             e.stopPropagation(); contextSongId = id;
             
-            let s = getRenderedSongs().find(x => x.id === id);
-            if (!s && library) s = library.find(x => x.id === id);
-            if (!s && lastPlayed && lastPlayed.id === id) s = lastPlayed;
+            let s = findSongObj(id);
             if(!s) return;
             
             document.getElementById('sheetTitle').innerText = s.title;
@@ -1193,9 +1222,8 @@
             }, 10);
         }
 
-        // --- SONG INFO PANEL (For Full-Screen) ---
         window.openInfoModal = function() {
-            const s = activeSongId ? (getRenderedSongs().find(x => x.id === activeSongId) || library.find(x => x.id === activeSongId) || lastPlayed) : lastPlayed;
+            const s = activeSongId ? findSongObj(activeSongId) : lastPlayed;
             if(!s) return;
 
             document.getElementById('infoTitle').innerText = s.title;
@@ -1234,7 +1262,7 @@
             if (currentView.startsWith('playlist:')) {
                 const pName = currentView.substring(9);
                 if (playlists[pName]) {
-                    playlists[pName] = playlists[pName].filter(id => id !== contextSongId);
+                    playlists[pName] = playlists[pName].filter(id => id.toString() !== contextSongId.toString());
                     saveLibrary();
                     renderList();
                 }
@@ -1254,12 +1282,8 @@
                     btn.className = "w-full p-4 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-lg text-left btn-anim shadow-sm border border-transparent hover:border-white/10";
                     btn.innerText = name;
                     btn.onclick = () => { 
-                        let song = library.find(x => x.id === contextSongId);
-                        if(!song) {
-                            song = cloudSongs.find(x => x.id === contextSongId);
-                            if(!song && lastPlayed && lastPlayed.id === contextSongId) song = lastPlayed;
-                            if(song) library.push({...song});
-                        }
+                        let song = findSongObj(contextSongId);
+                        if(song && !library.find(x => x.id.toString() === song.id.toString())) library.push({...song});
                         
                         if(!playlists[name].includes(contextSongId)) playlists[name].push(contextSongId); 
                         saveLibrary(); 
@@ -1271,58 +1295,67 @@
             }, 300);
         };
 
-        // --- AUDIO ENGINE ---
+        // --- AUDIO ENGINE & QUEUE LOGIC ---
         const audio = document.getElementById('mainAudio');
 
-        // DO NOT CHANGE: Using the user's original working code for playback
         window.playSong = function(id) {
             activeSongId = id; 
-            let s = getRenderedSongs().find(x => x.id === id);
-            if (!s && library) s = library.find(x => x.id === id);
-            if (!s && lastPlayed && lastPlayed.id === id) s = lastPlayed;
-            if(!s) return;
             
+            let s = null;
+            let q = [];
+
+            if (currentView === 'favs') {
+                q = library.filter(x => x.fav); s = q.find(x => x.id.toString() === id.toString());
+            } else if (currentView.startsWith('playlist:')) {
+                const pName = currentView.substring(9);
+                q = library.filter(x => playlists[pName] && playlists[pName].includes(x.id));
+                s = q.find(x => x.id.toString() === id.toString());
+            } else {
+                if (cloudSongs.find(x => x.id.toString() === id.toString())) { q = cloudSongs; s = q.find(x => x.id.toString() === id.toString()); }
+                else if (playHistory.find(x => x.id.toString() === id.toString())) { q = playHistory; s = q.find(x => x.id.toString() === id.toString()); }
+                else if (dashboardData.artist.find(x => x.id.toString() === id.toString())) { q = dashboardData.artist; s = q.find(x => x.id.toString() === id.toString()); }
+                else if (dashboardData.similar.find(x => x.id.toString() === id.toString())) { q = dashboardData.similar; s = q.find(x => x.id.toString() === id.toString()); }
+                else if (dashboardData.trending.find(x => x.id.toString() === id.toString())) { q = dashboardData.trending; s = q.find(x => x.id.toString() === id.toString()); }
+                else if (library.find(x => x.id.toString() === id.toString())) { q = library; s = q.find(x => x.id.toString() === id.toString()); }
+            }
+            
+            if (!s && lastPlayed && lastPlayed.id.toString() === id.toString()) { s = lastPlayed; q = [lastPlayed]; }
+            if (!s) return;
+
+            currentQueue = q; 
+            
+            playHistory = playHistory.filter(x => x.id.toString() !== s.id.toString());
+            playHistory.unshift(s);
+            if (playHistory.length > 8) playHistory.pop();
+            localStorage.setItem('blossomPlayHistory', JSON.stringify(playHistory));
+
             lastPlayed = s;
             localStorage.setItem('blossomLastPlayed', JSON.stringify(lastPlayed));
             
             audio.src = s.url;
-            audio.play().catch(e => {
-                console.error("Playback failed", e);
-                alert("Browser blocked audio. Please click play or ensure popups aren't blocked.");
-            });
+            audio.play().catch(e => { console.error("Playback failed", e); });
             
             playing = true;
             updatePlayerUI(); 
             renderList();
         }
 
-        // DO NOT CHANGE: Using the user's original working UI updater
         function updatePlayerUI() {
-            const s = activeSongId ? getRenderedSongs().find(x => x.id === activeSongId) || library.find(x => x.id === activeSongId) || lastPlayed : lastPlayed;
+            const s = activeSongId ? findSongObj(activeSongId) : lastPlayed;
             if(!s) return;
 
             const pIcon = document.getElementById('playIcon');
             const pPause = document.getElementById('pauseIcon');
             if (pIcon && pPause) {
-                if (playing) {
-                    pIcon.classList.add('hidden');
-                    pPause.classList.remove('hidden');
-                } else {
-                    pIcon.classList.remove('hidden');
-                    pPause.classList.add('hidden');
-                }
+                if (playing) { pIcon.classList.add('hidden'); pPause.classList.remove('hidden'); } 
+                else { pIcon.classList.remove('hidden'); pPause.classList.add('hidden'); }
             }
 
             const fsPIcon = document.getElementById('fsPlayIcon');
             const fsPPause = document.getElementById('fsPauseIcon');
             if (fsPIcon && fsPPause) {
-                if (playing) {
-                    fsPIcon.classList.add('hidden');
-                    fsPPause.classList.remove('hidden');
-                } else {
-                    fsPIcon.classList.remove('hidden');
-                    fsPPause.classList.add('hidden');
-                }
+                if (playing) { fsPIcon.classList.add('hidden'); fsPPause.classList.remove('hidden'); } 
+                else { fsPIcon.classList.remove('hidden'); fsPPause.classList.add('hidden'); }
             }
             
             document.getElementById('trackTitle').innerText = s.title;
@@ -1337,7 +1370,7 @@
             }
             
             const favIcon = document.getElementById('trackFavIcon');
-            if(favIcon) favIcon.className = `w-6 h-6 ${isFav(s.id) ? 'fav-active' : 'text-white/30'}`;
+            if(favIcon) favIcon.className = `w-6 h-6 ${isFav(s.id) ? 'fav-active text-rose-400 fill-rose-400' : 'text-white/30'}`;
             
             document.getElementById('fsTitle').innerText = s.title;
             document.getElementById('fsArtist').innerText = s.artist;
@@ -1360,24 +1393,20 @@
             document.getElementById('fsTotalTime').innerText = formatTimeNumber(lastPlayed.duration);
         }
 
-        document.getElementById('trackFavBtn').onclick = () => { 
-            if(activeSongId || lastPlayed) toggleFav({stopPropagation:()=>{}}, activeSongId || lastPlayed.id); 
-        };
-
         window.playNext = function() {
             if(playQueue.length > 0) { playSong(playQueue.shift()); return; }
-            const vs = getRenderedSongs();
-            if(vs.length === 0) return;
-            let idx = vs.findIndex(x => x.id === activeSongId);
-            playSong(vs[(idx + 1) % vs.length].id);
+            if(currentQueue.length === 0) return;
+            let idx = currentQueue.findIndex(x => x.id.toString() === activeSongId?.toString());
+            if (idx === -1) idx = 0;
+            playSong(currentQueue[(idx + 1) % currentQueue.length].id);
         }
 
         window.playPrev = function() {
             if(audio.currentTime > 3) { audio.currentTime = 0; return; }
-            const vs = getRenderedSongs();
-            if(vs.length === 0) return;
-            let idx = vs.findIndex(x => x.id === activeSongId);
-            playSong(vs[(idx - 1 + vs.length) % vs.length].id);
+            if(currentQueue.length === 0) return;
+            let idx = currentQueue.findIndex(x => x.id.toString() === activeSongId?.toString());
+            if (idx === -1) idx = 0;
+            playSong(currentQueue[(idx - 1 + currentQueue.length) % currentQueue.length].id);
         }
 
         window.togglePlay = function() {
@@ -1414,9 +1443,13 @@
         
         document.getElementById('volumeSlider').oninput = (e) => audio.volume = e.target.value / 100;
         
-        document.getElementById('progress').oninput = (e) => audio.currentTime = (e.target.value/100) * audio.duration;
-        document.getElementById('mobileProgress').oninput = (e) => audio.currentTime = (e.target.value/100) * audio.duration;
-        document.getElementById('fsProgress').oninput = (e) => audio.currentTime = (e.target.value/100) * audio.duration;
+        function updateScrub(e) {
+            const duration = audio.duration || (lastPlayed ? lastPlayed.duration : 0);
+            if (duration > 0) audio.currentTime = (e.target.value / 100) * duration;
+        }
+        document.getElementById('progress').oninput = updateScrub;
+        document.getElementById('mobileProgress').oninput = updateScrub;
+        document.getElementById('fsProgress').oninput = updateScrub;
 
         function formatTimeNumber(seconds) {
             if (isNaN(seconds) || seconds < 0) return "0:00";
@@ -1444,7 +1477,7 @@
             }, 600);
         }
 
-        // --- KEYBOARD SHORTCUTS (DO NOT CHANGE) ---
+        // --- KEYBOARD SHORTCUTS ---
         window.addEventListener('keydown', (e) => {
             if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') return;
 
