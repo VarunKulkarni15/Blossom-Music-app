@@ -1,0 +1,448 @@
+/* =========================================
+           DYNAMIC THEME ENGINE & ANIMATIONS
+           ========================================= */
+        [id$="Modal"], #bottomSheet { display: none; }
+        
+        body { margin: 0; font-family: 'Poppins', sans-serif; overflow: hidden; height: 100dvh; display: flex; align-items: center; justify-content: center; }
+
+        /* --- THEME 1: DARK AMBIENT (Default) --- */
+        body.theme-dark {
+            background-color: #050508; color: #f8fafc;
+            background-image: radial-gradient(circle at 10% 20%, #103b4a 0%, transparent 45%), radial-gradient(circle at 50% 100%, #750e32 0%, transparent 55%);
+            background-size: 120% 120%; animation: ambientGlow 20s ease-in-out infinite alternate;
+        }
+        body.theme-dark #splashScreen { background: linear-gradient(135deg, #050508 0%, #103b4a 100%); }
+        body.theme-dark .app-glass { background: rgba(15, 15, 20, 0.35); backdrop-filter: blur(40px) saturate(150%); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8); }
+        body.theme-dark .panel-glass { background: rgba(0, 0, 0, 0.2); border-right: 1px solid rgba(255, 255, 255, 0.03); }
+        body.theme-dark .active-gradient { background: linear-gradient(135deg, #ff5e62 0%, #ff9966 100%); box-shadow: 0 10px 25px -5px rgba(255, 94, 98, 0.4); color: white !important; border: none !important;}
+        body.theme-dark .play-btn-bg { background: linear-gradient(135deg, #4aa6c2 0%, #1e5c73 100%); box-shadow: 0 8px 25px -5px rgba(44, 110, 133, 0.6); color: white; }
+        body.theme-dark .fav-active { color: white; opacity: 1 !important; fill: white; }
+        body.theme-dark .petal { display: none; } 
+
+        /* --- THEME 2: PINK BLOSSOM --- */
+        body.theme-pink {
+            background-color: transparent; color: #f8fafc;
+            background-image: linear-gradient(135deg, #e06d8c 0%, #d66a98 100%);
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+        }
+        body.theme-pink #splashScreen { background: linear-gradient(135deg, #2a0a18 0%, #59172c 100%); }
+        body.theme-pink .app-glass { background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(40px) saturate(160%); border: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2); }
+        body.theme-pink .panel-glass { background: rgba(255, 255, 255, 0.05); border-right: 1px solid rgba(255, 255, 255, 0.2); }
+        body.theme-pink .active-gradient { background: rgba(255, 255, 255, 0.25) !important; border: 1px solid rgba(255, 255, 255, 0.5) !important; color: white !important; box-shadow: none !important;}
+        body.theme-pink .play-btn-bg { background: white; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); color: #e06d8c; }
+        body.theme-pink .fav-active { color: #fb7185; fill: #fb7185; opacity: 1 !important; }
+        body.theme-pink .bg-white\/5 { background-color: rgba(255, 255, 255, 0.1) !important; }
+        body.theme-pink .bg-white\/10 { background-color: rgba(255, 255, 255, 0.2) !important; }
+        body.theme-pink .border-white\/5 { border-color: rgba(255, 255, 255, 0.2) !important; }
+        body.theme-pink .border-white\/10 { border-color: rgba(255, 255, 255, 0.3) !important; }
+        body.theme-pink .text-white\/30 { color: rgba(255, 255, 255, 0.5) !important; }
+        body.theme-pink .text-white\/40 { color: rgba(255, 255, 255, 0.6) !important; }
+        body.theme-pink .text-white\/50 { color: rgba(255, 255, 255, 0.7) !important; }
+        body.theme-pink .item-glass:hover:not(.active-gradient) { background: rgba(255, 255, 255, 0.15) !important; border-color: rgba(255, 255, 255, 0.3) !important; transform: translateX(5px); }
+        body.theme-pink .petal { position: absolute; background-color: rgba(255, 200, 210, 0.45); border-radius: 150% 0 150% 0; animation: fall linear infinite; pointer-events: none; z-index: 0; display: block; }
+
+        /* --- THEME 3: EMERALD AURA --- */
+        body.theme-emerald {
+            background-color: #022c22; color: #f8fafc;
+            background-image: radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.25) 0%, transparent 55%), radial-gradient(circle at 80% 80%, rgba(52, 211, 153, 0.2) 0%, transparent 50%), radial-gradient(circle at 50% 10%, rgba(5, 150, 105, 0.15) 0%, transparent 60%);
+            background-size: 150% 150%; animation: emeraldGlow 15s ease-in-out infinite alternate;
+        }
+        body.theme-emerald #splashScreen { background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); }
+        body.theme-emerald .app-glass { background: rgba(2, 44, 34, 0.6); backdrop-filter: blur(40px) saturate(140%); border: 1px solid rgba(16, 185, 129, 0.15); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(16, 185, 129, 0.05); }
+        body.theme-emerald .panel-glass { background: rgba(2, 44, 34, 0.4); border-right: 1px solid rgba(16, 185, 129, 0.1); }
+        body.theme-emerald .active-gradient { background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.15) 100%) !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.15) !important; color: white !important;}
+        body.theme-emerald .play-btn-bg { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 25px -5px rgba(16, 185, 129, 0.6); color: white; border: none; }
+        body.theme-emerald .fav-active { color: #34d399; fill: #34d399; opacity: 1 !important; }
+        body.theme-emerald .petal { display: none; }
+        body.theme-emerald .item-glass:hover:not(.active-gradient) { background: rgba(255, 255, 255, 0.05); border-color: rgba(16, 185, 129, 0.2); transform: translateX(6px); }
+        body.theme-emerald .bar { background: #34d399; box-shadow: 0 0 5px rgba(52, 211, 153, 0.5); }
+
+        /* --- THEME 4: ROYAL AMETHYST --- */
+        body.theme-amethyst {
+            background-color: #0f0714; color: #f8fafc;
+            background-image: radial-gradient(circle at 20% 30%, rgba(192, 132, 252, 0.25) 0%, transparent 55%), radial-gradient(circle at 80% 80%, rgba(217, 70, 239, 0.2) 0%, transparent 50%), radial-gradient(circle at 50% 10%, rgba(147, 51, 234, 0.15) 0%, transparent 60%);
+            background-size: 150% 150%; animation: emeraldGlow 15s ease-in-out infinite alternate;
+        }
+        body.theme-amethyst #splashScreen { background: linear-gradient(135deg, #0f0714 0%, #3b0764 100%); }
+        body.theme-amethyst .app-glass { background: rgba(20, 10, 25, 0.6); backdrop-filter: blur(40px) saturate(140%); border: 1px solid rgba(192, 132, 252, 0.15); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(192, 132, 252, 0.05); }
+        body.theme-amethyst .panel-glass { background: rgba(20, 10, 25, 0.4); border-right: 1px solid rgba(192, 132, 252, 0.1); }
+        body.theme-amethyst .active-gradient { background: linear-gradient(135deg, rgba(192, 132, 252, 0.15) 0%, rgba(217, 70, 239, 0.15) 100%) !important; border: 1px solid rgba(192, 132, 252, 0.3) !important; color: white !important;}
+        body.theme-amethyst .play-btn-bg { background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%); box-shadow: 0 8px 25px -5px rgba(192, 132, 252, 0.6); color: white; border: none; }
+        body.theme-amethyst .fav-active { color: #c084fc; fill: #c084fc; opacity: 1 !important; }
+        body.theme-amethyst .petal { display: none; }
+        body.theme-amethyst .item-glass:hover:not(.active-gradient) { background: rgba(255, 255, 255, 0.05); border-color: rgba(192, 132, 252, 0.2); transform: translateX(6px); }
+        body.theme-amethyst .bar { background: #c084fc; box-shadow: 0 0 5px rgba(192, 132, 252, 0.5); }
+
+        /* --- THEME 5: ARCTIC MONOCHROME --- */
+        body.theme-monochrome { background-color: #f1f5f9; color: #0f172a; background-image: none; }
+        body.theme-monochrome #splashScreen { background: #ffffff; }
+        body.theme-monochrome #splashScreen h1 { color: #000000; text-shadow: none; }
+        body.theme-monochrome #splashScreen p { color: #333333; text-shadow: none; }
+        body.theme-monochrome .app-glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(40px) saturate(120%); border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1); }
+        body.theme-monochrome .panel-glass { background: rgba(248, 250, 252, 0.6); border-right: 1px solid rgba(0, 0, 0, 0.05); }
+        body.theme-monochrome .active-gradient { background: #0f172a !important; border: 1px solid #0f172a !important; color: #ffffff !important; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important; }
+        body.theme-monochrome .play-btn-bg { background: #0f172a; box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.4); color: white; border: none; }
+        body.theme-monochrome .fav-active { color: #0f172a; fill: #0f172a; opacity: 1 !important; }
+        body.theme-monochrome .petal { display: none; }
+        body.theme-monochrome .item-glass:hover:not(.active-gradient) { background: rgba(0, 0, 0, 0.03); border-color: rgba(0, 0, 0, 0.1); transform: translateX(6px); }
+        body.theme-monochrome .bar { background: #ffffff; box-shadow: none; }
+        body.theme-monochrome .text-white { color: #0f172a !important; }
+        body.theme-monochrome .text-white\/80 { color: #1e293b !important; }
+        body.theme-monochrome .text-white\/70 { color: #334155 !important; }
+        body.theme-monochrome .text-white\/60 { color: #475569 !important; }
+        body.theme-monochrome .text-white\/50 { color: #64748b !important; }
+        body.theme-monochrome .text-white\/40 { color: #94a3b8 !important; }
+        body.theme-monochrome .text-white\/30 { color: #cbd5e1 !important; }
+        body.theme-monochrome .text-white\/20 { color: #e2e8f0 !important; }
+        body.theme-monochrome .active-gradient .text-white { color: #ffffff !important; }
+        body.theme-monochrome .active-gradient .text-white\/90 { color: rgba(255,255,255,0.9) !important; }
+        body.theme-monochrome .active-gradient .text-white\/50 { color: rgba(255,255,255,0.5) !important; }
+        body.theme-monochrome .active-gradient .text-white\/40 { color: rgba(255,255,255,0.4) !important; }
+        body.theme-monochrome .active-gradient .fav-active { color: #ffffff !important; fill: #ffffff !important; }
+        body.theme-monochrome .bg-white\/10 { background-color: rgba(0, 0, 0, 0.05) !important; }
+        body.theme-monochrome .bg-white\/5 { background-color: rgba(0, 0, 0, 0.02) !important; }
+        body.theme-monochrome .border-white\/10 { border-color: rgba(0, 0, 0, 0.1) !important; }
+        body.theme-monochrome .border-white\/5 { border-color: rgba(0, 0, 0, 0.05) !important; }
+        body.theme-monochrome .better-text-shadow { text-shadow: none; }
+        body.theme-monochrome .glow-text { text-shadow: none; }
+        body.theme-monochrome input, body.theme-monochrome textarea { background: rgba(0,0,0,0.05) !important; color: #000 !important; border-color: rgba(0,0,0,0.1) !important; }
+        body.theme-monochrome input::placeholder, body.theme-monochrome textarea::placeholder { color: rgba(0,0,0,0.4) !important; }
+        body.theme-monochrome .bg-black\/40 { background-color: rgba(0,0,0,0.05) !important; }
+        body.theme-monochrome .bg-black\/60, body.theme-monochrome .bg-black\/80 { background-color: rgba(255,255,255,0.9) !important; }
+        body.theme-monochrome .fs-bg-overlay { background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4) 0%, rgba(241,245,249,1) 100%); }
+
+        /* =========================================
+           🌌 SPATIAL & EARTH: CORE RESPONSIVE LAYOUT
+           ========================================= */
+        body.theme-spatial, body.theme-earth { background-color: #000; color: #ffffff; }
+        body.theme-spatial #bg-video, body.theme-earth #earth-video { display: block !important; }
+        body.theme-spatial #splashScreen, body.theme-earth #splashScreen { background: #000000; }
+        body.theme-spatial .petal, body.theme-earth .petal { display: none; }
+        
+        /* 💻 DESKTOP FLOATING UI */
+        @media (min-width: 768px) {
+            body.theme-spatial .app-glass, body.theme-earth .app-glass { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border: none !important; box-shadow: none; }
+            /* Perfectly even gaps around the floating layout */
+            body.theme-spatial .app-glass > .flex.flex-1, body.theme-earth .app-glass > .flex.flex-1 { padding: 1.5rem; gap: 1.5rem; }
+            
+            /* Restore top padding on main to prevent slicing the search/settings icons! */
+            body.theme-spatial main, body.theme-earth main { padding: 1.5rem 0.5rem 0 0.5rem; } 
+            
+            body.theme-spatial aside.panel-glass, body.theme-earth aside.panel-glass { margin: 0 !important; border-radius: 2rem !important; height: 100% !important; border-right: none !important; }
+            body.theme-spatial footer.panel-glass, body.theme-earth footer.panel-glass { border-radius: 2rem !important; margin: 0 1.5rem 1.5rem 1.5rem !important; width: calc(100% - 3rem) !important; border-top: none !important; }
+            
+            /* 3D Panel Glass for Desktop (Bottom sheet completely removed from here to prevent blob bugs) */
+            body.theme-spatial .panel-glass, body.theme-earth .panel-glass { 
+                background: rgba(20, 20, 25, 0.4) !important;
+                backdrop-filter: blur(40px) saturate(150%); -webkit-backdrop-filter: blur(40px) saturate(150%); 
+                border: none !important; box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative; z-index: 1;
+            }
+            
+            /* Desktop Glowing Masks */
+            body.theme-spatial .panel-glass::before, body.theme-earth .panel-glass::before {
+                content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px;
+                background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 20%, transparent 40%, transparent 60%, rgba(255,255,255,0.1) 80%, rgba(255,255,255,0.4) 100%);
+                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+            }
+        }
+
+        /* 📱 MOBILE SOLID UI (Fixes all cutoffs and overlapping) */
+        @media (max-width: 767px) {
+            body.theme-spatial .app-glass, body.theme-earth .app-glass {
+                background: rgba(10, 10, 15, 0.4) !important; /* Dim the video on mobile to ensure readability */
+                backdrop-filter: blur(20px) saturate(120%) !important;
+                -webkit-backdrop-filter: blur(20px) saturate(120%) !important;
+                border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            }
+            body.theme-spatial .panel-glass, body.theme-earth .panel-glass {
+                background: rgba(5, 5, 10, 0.6) !important;
+                backdrop-filter: blur(30px) !important; -webkit-backdrop-filter: blur(30px) !important;
+                border: none !important; border-top: 1px solid rgba(255,255,255,0.1) !important; border-right: 1px solid rgba(255,255,255,0.1) !important;
+                border-radius: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; animation: none !important;
+            }
+            body.theme-spatial footer.panel-glass, body.theme-earth footer.panel-glass { border-right: none !important; }
+            body.theme-spatial aside.panel-glass, body.theme-earth aside.panel-glass { border-top: none !important; }
+            body.theme-spatial .panel-glass::before, body.theme-earth .panel-glass::before { display: none !important; }
+            
+            /* Restore standard mobile progress bar */
+            body.theme-spatial #mobileProgress, body.theme-earth #mobileProgress {
+                position: absolute; top: 0; left: 0; width: 100%; transform: translateY(-50%);
+                background: rgba(255,255,255,0.2); box-shadow: none; height: 3px; border-radius: 0;
+            }
+        }
+
+        /* 🪟 Modals, Bottom Sheet & Petal AI */
+        /* Separate, clean styling for Bottom Sheet Context Menu to prevent massive blob bug */
+        body.theme-spatial #bottomSheetContent, body.theme-earth #bottomSheetContent {
+            background: rgba(15, 15, 20, 0.8) !important; 
+            backdrop-filter: blur(50px) saturate(150%) !important; -webkit-backdrop-filter: blur(50px) saturate(150%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important; border-bottom: none !important; border-top: 1px solid rgba(255, 255, 255, 0.3) !important; 
+            box-shadow: 0 -20px 80px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.2) !important;
+        }
+
+        body.theme-spatial div[id$="Modal"] > .app-glass, body.theme-spatial #aiChatWindow,
+        body.theme-earth div[id$="Modal"] > .app-glass, body.theme-earth #aiChatWindow {
+            background: rgba(10, 10, 15, 0.6) !important; /* Solid dark modal to ensure readability */
+            backdrop-filter: blur(50px) saturate(150%) !important; -webkit-backdrop-filter: blur(50px) saturate(150%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 1px solid rgba(255, 255, 255, 0.3) !important; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.2) !important;
+        }
+
+        /* 🔍 Anti-Glare Glass for Search & Settings Buttons */
+        body.theme-spatial .search-container, body.theme-spatial #settingsBtn,
+        body.theme-earth .search-container, body.theme-earth #settingsBtn {
+            background: rgba(20, 20, 25, 0.6) !important; 
+            backdrop-filter: blur(20px) saturate(120%) !important; -webkit-backdrop-filter: blur(20px) saturate(120%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important; border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+        }
+        body.theme-spatial .search-container.expanded, body.theme-earth .search-container.expanded {
+            background: rgba(30, 30, 35, 0.8) !important; border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* 🪟 Premium Glass for Inputs & Modal Buttons (Playlists, Feedback, etc.) */
+        body.theme-spatial div[id$="Modal"] input, body.theme-spatial div[id$="Modal"] textarea, body.theme-spatial .close-modal-btn:not(.absolute),
+        body.theme-earth div[id$="Modal"] input, body.theme-earth div[id$="Modal"] textarea, body.theme-earth .close-modal-btn:not(.absolute) {
+            background: rgba(20, 20, 25, 0.5) !important; 
+            backdrop-filter: blur(20px) saturate(120%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+            color: white !important;
+            transition: all 0.3s ease !important;
+        }
+        body.theme-spatial div[id$="Modal"] input:focus, body.theme-spatial div[id$="Modal"] textarea:focus, body.theme-spatial .close-modal-btn:not(.absolute):hover,
+        body.theme-earth div[id$="Modal"] input:focus, body.theme-earth div[id$="Modal"] textarea:focus, body.theme-earth .close-modal-btn:not(.absolute):hover {
+            background: rgba(40, 40, 45, 0.8) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+        }
+        body.theme-spatial div[id$="Modal"] input::placeholder, body.theme-earth div[id$="Modal"] input::placeholder, 
+        body.theme-spatial div[id$="Modal"] textarea::placeholder, body.theme-earth div[id$="Modal"] textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* 🎵 Playlist Select List Buttons specifically (No floating jump, just clean glow) */
+        body.theme-spatial #playlistSelectList button, body.theme-earth #playlistSelectList button {
+            background: rgba(20, 20, 25, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+            transform: none !important;
+            transition: all 0.2s ease !important;
+        }
+        body.theme-spatial #playlistSelectList button:hover, body.theme-earth #playlistSelectList button:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1) !important;
+        }
+
+        /* 🎶 Song List Rows (Beautiful Glass - NO SOLID BLACK) */
+        body.theme-spatial .item-glass, body.theme-earth .item-glass { 
+            background: rgba(255, 255, 255, 0.04) !important; /* Extremely delicate glass */
+            backdrop-filter: blur(12px) saturate(120%); -webkit-backdrop-filter: blur(12px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.03) !important; border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; z-index: 1;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s, background 0.4s;
+        }
+        body.theme-spatial .item-glass::after, body.theme-earth .item-glass::after { display: none !important; } 
+        
+        /* Softened hover so list items don't jitter or jump awkwardly */
+        body.theme-spatial .item-glass:hover:not(.active-gradient), body.theme-earth .item-glass:hover:not(.active-gradient) { 
+            transform: scale(1.01); 
+            background: rgba(255, 255, 255, 0.06) !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.15); border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* 🌌 THEME SPECIFICS: SPATIAL BLOOM */
+        body.theme-spatial .active-gradient { 
+            background: rgba(255, 255, 255, 0.15) !important; /* Bright active glass */
+            backdrop-filter: blur(30px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important; border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+            color: white !important; box-shadow: 0 15px 30px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.4) !important; 
+        }
+        body.theme-spatial .play-btn-bg { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); color: white; }
+        body.theme-spatial .fav-active { color: #ffffff; fill: #ffffff; opacity: 1 !important; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); }
+        body.theme-spatial .bar { background: #ffffff; box-shadow: 0 0 8px #ffffff; }
+        body.theme-spatial p.text-white\/50, body.theme-spatial p.text-white\/60 { color: rgba(255, 255, 255, 0.6) !important; }
+        body.theme-spatial #engineTabsContainer > div { background: rgba(255,255,255,0.05) !important; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        body.theme-spatial .fs-bg-overlay { background: rgba(0, 0, 0, 0.5) !important; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); }
+        
+        body.theme-spatial #aiChatWindow > div:first-child { background: rgba(255,255,255,0.05) !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        body.theme-spatial #aiChatWindow > div:last-child { background: rgba(0,0,0,0.5) !important; border-top: 1px solid rgba(255,255,255,0.1); }
+        body.theme-spatial #aiChatMessages > div:not(.active-gradient) { background: rgba(0,0,0,0.5) !important; border: 1px solid rgba(255,255,255,0.05); }
+        body.theme-spatial #aiChatMessages > div.active-gradient { background: rgba(255,255,255,0.15) !important; border: 1px solid rgba(255,255,255,0.2) !important; box-shadow: none !important; }
+
+        /* 🌍 THEME SPECIFICS: VISION EARTH */
+        body.theme-earth .active-gradient { 
+            background: rgba(52, 211, 153, 0.15) !important; /* Emerald active glass */
+            backdrop-filter: blur(30px) saturate(150%);
+            border: 1px solid rgba(52, 211, 153, 0.3) !important; border-top: 1px solid rgba(52, 211, 153, 0.6) !important; 
+            color: white !important; box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 1px 3px rgba(52, 211, 153, 0.4) !important; 
+        }
+        body.theme-earth .play-btn-bg { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); color: white; transition: all 0.3s; }
+        body.theme-earth .play-btn-bg:hover { border-color: rgba(52, 211, 153, 0.6); box-shadow: 0 0 15px rgba(52, 211, 153, 0.3); }
+        body.theme-earth .fav-active { color: #34d399; fill: #34d399; opacity: 1 !important; filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.6)); }
+        body.theme-earth .bar { background: #34d399; box-shadow: 0 0 8px rgba(52, 211, 153, 0.6); }
+        body.theme-earth p.text-white\/50, body.theme-earth p.text-white\/60 { color: rgba(255, 255, 255, 0.6) !important; }
+        body.theme-earth #engineTabsContainer > div { background: rgba(255,255,255,0.03) !important; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        body.theme-earth .fs-bg-overlay { background: rgba(0, 0, 0, 0.4) !important; backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); }
+
+        body.theme-earth #aiChatWindow > div:first-child { background: rgba(255,255,255,0.05) !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        body.theme-earth #aiChatWindow > div:last-child { background: rgba(0,0,0,0.5) !important; border-top: 1px solid rgba(255,255,255,0.1); }
+        body.theme-earth #aiChatMessages > div:not(.active-gradient) { background: rgba(0,0,0,0.5) !important; border: 1px solid rgba(255,255,255,0.05); }
+        body.theme-earth #aiChatMessages > div.active-gradient { background: rgba(52, 211, 153, 0.15) !important; border: 1px solid rgba(52, 211, 153, 0.3) !important; box-shadow: none !important; }
+
+        body.theme-spatial #fullScreenPlayer, body.theme-earth #fullScreenPlayer { background: transparent !important; }
+        body.theme-spatial #fsBg, body.theme-earth #fsBg { display: none !important; } 
+
+        /* =========================================================
+           🚀 SPATIAL & EARTH ANIMATIONS (Maximum Zero-Gravity)
+           ========================================================= */
+        @keyframes spatial-float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes widget-float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
+        
+        /* Floating strictly for Desktop! */
+        @media (min-width: 768px) {
+            body.theme-spatial aside.panel-glass, body.theme-earth aside.panel-glass { animation: spatial-float 7s ease-in-out infinite; }
+            body.theme-spatial footer.panel-glass, body.theme-earth footer.panel-glass { animation: spatial-float 8.5s ease-in-out infinite 1.5s; }
+            body.theme-spatial .search-container, body.theme-spatial #settingsBtn,
+            body.theme-earth .search-container, body.theme-earth #settingsBtn { animation: widget-float 6s ease-in-out infinite 0.5s; will-change: transform; }
+            
+            /* Modals bobbing on desktop only */
+            body.theme-spatial div[id$="Modal"] > .app-glass, body.theme-earth div[id$="Modal"] > .app-glass {
+                animation: widget-float 7s ease-in-out infinite 0.2s;
+            }
+            body.theme-spatial #aiChatWindow, body.theme-earth #aiChatWindow {
+                animation: spatial-float 8s ease-in-out infinite 0.5s;
+            }
+        }
+
+        body.theme-spatial .btn-anim, body.theme-spatial .nav-btn, body.theme-spatial .play-btn-bg, body.theme-spatial .theme-select-btn,
+        body.theme-earth .btn-anim, body.theme-earth .nav-btn, body.theme-earth .theme-select-btn {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s, box-shadow 0.3s !important;
+        }
+        
+        body.theme-spatial .btn-anim:hover, body.theme-spatial .nav-btn:hover, body.theme-spatial .play-btn-bg:hover, body.theme-spatial .theme-select-btn:hover,
+        body.theme-earth .btn-anim:hover, body.theme-earth .nav-btn:hover, body.theme-earth .theme-select-btn:hover {
+            transform: scale(1.05) translateY(-2px) !important; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.4) !important;
+        }
+        
+        body.theme-spatial .btn-anim:active, body.theme-spatial .nav-btn:active, body.theme-spatial .play-btn-bg:active, body.theme-spatial .theme-select-btn:active,
+        body.theme-earth .btn-anim:active, body.theme-earth .nav-btn:active, body.theme-earth .theme-select-btn:active {
+            transform: scale(0.95) !important;
+        }
+        
+        body.theme-spatial .search-container, body.theme-earth .search-container { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        body.theme-spatial .search-container:hover, body.theme-spatial #settingsBtn:hover {
+            transform: translateY(-2px) scale(1.02) !important; box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.4); background: rgba(30, 30, 35, 0.8) !important; border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        body.theme-earth .search-container:hover, body.theme-earth #settingsBtn:hover {
+            transform: translateY(-2px) scale(1.02) !important; box-shadow: 0 15px 30px rgba(0,0,0,0.6), inset 0 1px 2px rgba(52, 211, 153, 0.3); background: rgba(30, 30, 35, 0.8) !important; border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        body.theme-spatial i, body.theme-earth i { transition: color 0.3s ease, filter 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        body.theme-spatial button:hover i:not(.fav-active) { color: #ffffff !important; filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)); transform: scale(1.1); }
+        body.theme-earth button:hover i:not(.fav-active) { color: #ffffff !important; filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.5)); transform: scale(1.1); }
+
+        /* Animations & Utilities */
+        @keyframes ambientGlow { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes emeraldGlow { 0% { background-position: 0% 0%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 100%; } }
+        @keyframes fall { 0% { transform: translate(0, -10px) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(var(--drift), 100vh) rotate(360deg); opacity: 0; } }
+
+        .better-text-shadow { text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
+        .glow-text { text-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 2px 4px rgba(0,0,0,0.8); }
+
+        .bars { display: flex; align-items: flex-end; justify-content: center; gap: 3px; height: 16px; }
+        .bar { width: 3px; background: white; border-radius: 2px; animation: bounce 0.5s ease infinite alternate; }
+        .bar:nth-child(2) { animation-delay: 0.15s; }
+        .bar:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes bounce { 0% { height: 4px; } 100% { height: 16px; } }
+        
+        /* Petal Intro Draw Animation */
+        @keyframes drawArrow {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Splash Screen Cinematic Animations */
+        #splashScreen { transition: opacity 0.5s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.5s; z-index: 200; overflow: hidden; }
+        .splash-bg-anim { animation: splash-zoom 4s ease-out forwards; }
+        @keyframes splash-zoom { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+        .splash-logo-container { animation: splash-logo-enter 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: scale(0.2) rotate(-15deg); filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.1)); }
+        @keyframes splash-logo-enter { 0% { opacity: 0; transform: scale(0.2) rotate(-15deg); filter: blur(10px); } 60% { opacity: 1; transform: scale(1.1) rotate(5deg); filter: blur(0px); } 100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0px); } }
+        .splash-title-container { animation: splash-title-reveal 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards; animation-delay: 0.4s; opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(8px); }
+        @keyframes splash-title-reveal { 0% { opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(8px); letter-spacing: -2px; } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); letter-spacing: normal; } }
+        .splash-quote-anim { animation: splash-quote-slide 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; animation-delay: 1.2s; opacity: 0; transform: translateY(20px); }
+        @keyframes splash-quote-slide { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* =====================================================
+           CINEMATIC TWO-STAGE TRANSITION
+           ===================================================== */
+
+        /* Stage 1: Logo rockets forward and fills the screen */
+        @keyframes splash-logo-zoom-forward {
+            0%   { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0px); }
+            60%  { transform: scale(7) rotate(0deg); opacity: 1; filter: blur(0px); }
+            100% { transform: scale(16) rotate(0deg); opacity: 0; filter: blur(10px); }
+        }
+        .splash-logo-zoom-forward .splash-logo-container {
+            animation: splash-logo-zoom-forward 0.65s cubic-bezier(0.4, 0, 0.8, 1) forwards !important;
+        }
+        /* Instantly hide title/quote so only the logo does the zoom */
+        .splash-logo-zoom-forward .splash-title-container,
+        .splash-logo-zoom-forward .splash-quote-anim,
+        .splash-logo-zoom-forward .absolute.bottom-12 {
+            opacity: 0 !important;
+            transition: opacity 0.15s ease;
+        }
+
+        /* Stage 2: Main UI zooms OUT from large → normal, anchored to navbar logo */
+        @keyframes ui-zoom-out-reveal {
+            0%   { transform: scale(2.8); opacity: 0; filter: blur(8px); }
+            35%  { opacity: 1; filter: blur(0px); }
+            100% { transform: scale(1); opacity: 1; filter: blur(0px); }
+        }
+        #mainAppContainer.ui-zoom-reveal {
+            animation: ui-zoom-out-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+            /* Mobile: navbar logo is roughly at top-left of the container */
+            transform-origin: 48px 40px;
+        }
+        @media (min-width: 768px) {
+            #mainAppContainer.ui-zoom-reveal {
+                /* Desktop: sidebar logo sits a bit further in */
+                transform-origin: 64px 52px;
+            }
+        }
+
+        @keyframes blossom-float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(10deg); } }
+        .logo-animated { display: inline-block; animation: blossom-float 4s ease-in-out infinite; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.4)); }
+        
+        .btn-anim { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-anim:active { transform: scale(0.92); }
+        .item-glass { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; }
+        .item-glass:hover:not(.active-gradient) { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); transform: translateX(6px); }
+
+        /* Responsive Search Container */
+        .search-container { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 40px; height: 40px; overflow: hidden; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 9999px; }
+        .search-container.expanded { width: 180px; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+        @media (min-width: 768px) {
+            .search-container.expanded { width: 300px; }
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .hide-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .hide-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .hide-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .loader { border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid #ff5e62; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        
+        #fullScreenPlayer { transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s; z-index: 100; }
+        .fs-bg-overlay { background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); }
+
+        /* 🚀 THE PERFECT CROP FIX */
+        .yt-crop { object-fit: cover; aspect-ratio: 1/1; transform: scale(1.35); }

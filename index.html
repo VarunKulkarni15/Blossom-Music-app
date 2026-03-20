@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blossom Cloud Player</title>
+    
+    <link rel="icon" href="icon.ico?v=2" type="image/x-icon">
+    <link rel="shortcut icon" href="icon.ico?v=2" type="image/x-icon">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="theme-dark text-[15px] md:text-base">
+
+    <!-- AD-SHIELD ENGINE: Privacy-Enhanced Invisible Iframe -->
+    <div id="yt-player-container" class="absolute pointer-events-none" style="width: 40px; height: 40px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1; opacity: 0.01;"></div>
+
+    <!-- SPATIAL THEME VIDEOS -->
+    <video id="bg-video" autoplay loop muted playsinline preload="auto" class="fixed inset-0 w-full h-full object-cover z-[-2] hidden pointer-events-none opacity-100">
+        <source src="blackhole_loop.mp4" type="video/mp4">
+    </video>
+    <video id="earth-video" autoplay loop muted playsinline preload="auto" class="fixed inset-0 w-full h-full object-cover z-[-2] hidden pointer-events-none opacity-100">
+        <source src="earth_loop.mp4" type="video/mp4">
+    </video>
+
+    <!-- Cinematic Splash Screen -->
+    <div id="splashScreen" class="fixed inset-0 flex flex-col items-center justify-center pointer-events-auto">
+        <div class="absolute inset-0 splash-bg-anim bg-gradient-to-br from-black/40 to-transparent z-0"></div>
+        <div class="relative z-10 flex flex-col items-center w-full h-full justify-center px-4">
+            <div class="splash-logo-container mb-6">
+                <span class="text-7xl md:text-8xl logo-animated block drop-shadow-2xl">🌸</span>
+            </div>
+            <div class="splash-title-container text-center">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg">Blossom</h1>
+                <p id="splashQuote" class="mt-4 md:mt-5 text-white/80 font-medium italic tracking-wide text-lg md:text-xl splash-quote-anim"></p>
+            </div>
+            <div class="absolute bottom-12 overflow-hidden opacity-0" style="animation: splash-fade-in 2s ease-out forwards; animation-delay: 1.5s;">
+                <p class="text-[9px] md:text-[10px] text-white/40 tracking-[0.4em] uppercase font-bold">Hybrid Engine Active</p>
+            </div>
+        </div>
+        <div class="absolute inset-0 bg-black/60 z-[-1]"></div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Name Prompt Modal -->
+    <div id="nameModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center hidden opacity-0 transition-all duration-500 px-4">
+        <div class="app-glass rounded-[2rem] p-8 md:p-10 w-full max-w-sm flex flex-col items-center border border-white/10 shadow-2xl relative overflow-hidden text-center">
+            <span class="text-5xl md:text-6xl mb-6 logo-animated">🌸</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold mb-2 text-white">Welcome!</h2>
+            <p class="text-white/60 text-sm font-medium mb-8">What should we call you?</p>
+            <input type="text" id="nameInput" placeholder="Your Name" class="w-full bg-black/40 border border-white/10 rounded-xl px-5 py-4 text-white mb-6 focus:outline-none focus:border-rose-400 focus:bg-black/60 transition-all font-bold text-center text-lg shadow-inner placeholder-white/20" onkeypress="if(event.key === 'Enter') document.getElementById('saveNameBtn').click()">
+            <button id="saveNameBtn" class="w-full py-4 rounded-xl active-gradient text-white font-bold text-lg btn-anim shadow-lg">Start Listening</button>
+        </div>
+    </div>
+
+    <!-- 🌸 PETAL AI: Cinematic Spotlight Tutorial Overlay 🌸 -->
+    <div id="petalTutorialOverlay" class="fixed inset-0 z-[140] hidden opacity-0 transition-opacity duration-1000 bg-black/80 backdrop-blur-md pointer-events-auto flex items-center justify-center" onclick="closePetalTutorial()">
+        <div class="relative w-full h-full flex flex-col items-center justify-center pb-20 md:pb-0 pointer-events-none">
+            <!-- Center Text -->
+            <h1 class="text-4xl md:text-7xl font-extrabold text-white tracking-tight drop-shadow-2xl font-poppins text-center">Meet Petal 🌸!</h1>
+            <p class="text-white/60 font-medium text-sm md:text-lg mt-4 max-w-md text-center px-6">Your chaotic Gen-Z music bestie is here to judge your taste and take control of the Aux.</p>
+            
+            <style>
+                @keyframes fade-in { to { opacity: 1; } }
+            </style>
+        </div>
+    </div>
+
+    <!-- Original Privacy Disclaimer Modal Overlay -->
+    <div id="tutorialOverlay" class="fixed inset-0 z-[140] hidden opacity-0 transition-opacity duration-1000 bg-black/80 backdrop-blur-[2px] pointer-events-auto">
+        <div id="tutorialFocusArea" class="absolute flex flex-col items-center justify-center" style="transition: all 0.3s ease;">
+            <div id="tutorialTooltip" class="absolute bottom-full mb-3 flex flex-col items-center animate-bounce w-max pointer-events-none">
+                <div class="bg-rose-500 text-white text-xs md:text-sm font-bold px-4 py-2 rounded-xl shadow-xl mb-1 relative text-center tracking-wide">
+                    Quick update! Click here<br>to see our privacy info.
+                    <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-rose-500 rotate-45"></div>
+                </div>
+                <i data-lucide="arrow-down" class="w-5 h-5 text-rose-400"></i>
+            </div>
+            <button class="w-full h-full rounded-full bg-rose-500/20 border-2 border-rose-500 text-white flex items-center justify-center shadow-[0_0_30px_rgba(244,63,94,0.6)] animate-pulse" onclick="openDisclaimerFromTutorial()">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Project Disclaimer Modal -->
+    <div id="disclaimerModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[120] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-[2rem] p-6 md:p-8 w-full max-w-md flex flex-col border border-white/10 shadow-2xl relative">
+            <button class="close-modal-btn absolute top-5 right-5 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <div class="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0 shadow-inner">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white tracking-wide">Project Disclaimer</h2>
+            </div>
+            
+            <div class="space-y-4 text-white/70 text-sm leading-relaxed mb-8">
+                <p><strong class="text-white">🎓 Educational Project:</strong> Blossom is a non-commercial, college portfolio project. We are not affiliated, associated, or endorsed by JioSaavn, Apple, or any other third-party entity.</p>
+                <p><strong class="text-white">🔒 100% Private:</strong> We believe in absolute privacy. This app requires zero sign-ups, and we do not track, collect, or store any of your personal data on external servers. Everything stays securely on your device.</p>
+            </div>
+            
+            <button class="close-modal-btn w-full py-3.5 rounded-xl active-gradient text-white font-bold text-base btn-anim shadow-lg transition-colors">I Understand</button>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[80] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-[2rem] p-6 md:p-8 w-full max-w-md flex flex-col relative border border-white/10 shadow-2xl">
+            <button class="close-modal-btn absolute top-5 right-5 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h2 class="text-xl md:text-2xl font-bold mb-2 text-white flex items-center gap-2"><i data-lucide="send" class="text-rose-400 w-5 h-5 md:w-6 md:h-6"></i> Send Feedback</h2>
+            <p class="text-white/50 text-xs md:text-sm mb-6">Drop your suggestions or bugs. It goes straight to my Discord!</p>
+            
+            <input type="text" id="feedbackName" placeholder="Your Name (Optional)" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-rose-400 transition-colors placeholder-white/30 text-sm">
+            <textarea id="feedbackText" rows="4" placeholder="Type your feedback here..." class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:border-rose-400 transition-colors resize-none placeholder-white/30 text-sm"></textarea>
+            
+            <button id="sendFeedbackBtn" class="w-full py-3.5 rounded-xl active-gradient text-white font-bold text-base md:text-lg btn-anim shadow-lg flex justify-center items-center gap-2 transition-all">
+                <span id="fbBtnText">Send to Discord</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-2xl flex flex-col">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl md:text-2xl font-bold text-white">App Settings</h2>
+                <button class="close-modal-btn text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="mb-4">
+                <p class="text-[10px] md:text-xs uppercase tracking-widest text-white/50 font-bold mb-4">Select Theme</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                    <button class="theme-select-btn flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-dark">
+                        <div class="w-full h-10 md:h-14 rounded-xl bg-black overflow-hidden relative shadow-inner">
+                            <div class="absolute inset-0 bg-gradient-to-br from-[#103b4a] to-[#750e32] opacity-50"></div>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-bold text-white text-center leading-tight">Dark Ambient</span>
+                    </button>
+                    <button class="theme-select-btn flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-pink">
+                        <div class="w-full h-10 md:h-14 rounded-xl bg-gradient-to-br from-[#e06d8c] to-[#d66a98] shadow-inner"></div>
+                        <span class="text-[10px] md:text-xs font-bold text-white text-center leading-tight">Pink Blossom</span>
+                    </button>
+                    <button class="theme-select-btn flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-emerald">
+                        <div class="w-full h-10 md:h-14 rounded-xl bg-gradient-to-br from-[#10b981] to-[#022c22] shadow-inner"></div>
+                        <span class="text-[10px] md:text-xs font-bold text-white text-center leading-tight">Emerald Aura</span>
+                    </button>
+                    <button class="theme-select-btn flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-amethyst">
+                        <div class="w-full h-10 md:h-14 rounded-xl bg-gradient-to-br from-[#c084fc] to-[#0f0714] shadow-inner"></div>
+                        <span class="text-[10px] md:text-xs font-bold text-white text-center leading-tight">Royal Amethyst</span>
+                    </button>
+                    <button class="theme-select-btn flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-monochrome">
+                        <div class="w-full h-10 md:h-14 rounded-xl bg-white border border-gray-200 shadow-inner"></div>
+                        <span class="text-[10px] md:text-xs font-bold text-white text-center leading-tight">Arctic Monochrome</span>
+                    </button>
+                    <button class="theme-select-btn flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-spatial">
+                        <div class="w-full h-10 md:h-14 rounded-xl bg-black overflow-hidden relative shadow-inner border border-white/20">
+                            <img src="blackhole.png" alt="Blackhole Theme" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-bold text-white text-center leading-tight">Spatial Bloom</span>
+                    </button>
+                    <button class="theme-select-btn flex flex-col items-center gap-2 p-3 rounded-2xl bg-white/5 border-2 border-white/10 hover:bg-white/10 transition btn-anim" data-theme="theme-earth">
+                        <div class="w-full h-10 md:h-14 rounded-xl bg-black overflow-hidden relative shadow-inner border border-white/20">
+                            <img src="earth.png" alt="Earth Theme" class="absolute inset-0 w-full h-full object-cover opacity-90">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        </div>
+                        <span class="text-[10px] md:text-xs font-bold text-white text-center leading-tight">Vision Earth</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Song Info Panel -->
+    <div id="infoModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-sm flex flex-col relative border border-white/10 shadow-2xl">
+            <button onclick="closeInfoModal()" class="absolute top-5 right-5 text-white/50 hover:text-white transition close-info-btn"><i data-lucide="x" class="w-6 h-6"></i></button>
+            
+            <div class="flex items-center gap-4 mb-8 mt-2">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-white/5 shrink-0 shadow-md relative">
+                    <img id="infoArt" src="" class="w-full h-full object-cover hidden absolute inset-0 z-10">
+                    <div id="infoFallback" class="w-full h-full flex items-center justify-center text-3xl absolute inset-0 z-0">🌸</div>
+                </div>
+                <div class="overflow-hidden">
+                    <h3 id="infoTitle" class="text-lg md:text-xl font-extrabold text-white truncate mb-1">Song Title</h3>
+                    <p id="infoArtist" class="text-white/60 text-xs md:text-sm font-medium truncate">Artist</p>
+                </div>
+            </div>
+            
+            <div class="space-y-4 mb-8 text-xs md:text-sm font-medium">
+                <div class="flex justify-between border-b border-white/5 pb-2">
+                    <span class="text-white/40">Audio Quality</span>
+                    <span class="text-white flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-400"></i> Lossless</span>
+                </div>
+                <div class="flex justify-between border-b border-white/5 pb-2">
+                    <span class="text-white/40">Track Length</span>
+                    <span class="text-white" id="infoDuration">0:00</span>
+                </div>
+                <div class="flex justify-between border-b border-white/5 pb-2 items-center">
+                    <span class="text-white/40">Added to Library</span>
+                    <span class="text-white" id="infoDate">Just now</span>
+                </div>
+            </div>
+            
+            <!-- Creator Socials Flex -->
+            <div class="flex justify-center gap-6 pt-3 md:pt-5 border-t border-white/10 text-white/30">
+                <a href="https://www.instagram.com/varun_kulkarni__/" target="_blank" class="hover:text-white transition-colors" title="Developer Instagram"><i data-lucide="instagram" class="w-5 h-5 md:w-6 md:h-6"></i></a>
+                <a href="https://github.com/VarunKulkarni15" target="_blank" class="hover:text-white transition-colors" title="Developer GitHub"><i data-lucide="github" class="w-5 h-5 md:w-6 md:h-6"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Modal (Playlist) -->
+    <div id="inputModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-sm flex flex-col">
+            <h2 id="inputModalTitle" class="text-lg md:text-xl font-bold mb-4 text-white">New Playlist</h2>
+            <input type="text" id="inputModalField" placeholder="Playlist Name" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white mb-6 focus:outline-none focus:bg-black/50 transition-all font-medium text-sm md:text-base">
+            <div class="flex gap-4">
+                <button class="close-modal-btn flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold btn-anim border border-white/5 text-sm md:text-base">Cancel</button>
+                <button id="inputModalSave" class="flex-1 py-3 rounded-xl active-gradient text-white font-bold btn-anim shadow-lg text-sm md:text-base">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 md:p-8 w-full max-w-sm flex flex-col text-center border border-white/10">
+            <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4 border border-rose-500/30">
+                <i data-lucide="alert-triangle" class="w-6 h-6 md:w-8 md:h-8"></i>
+            </div>
+            <h2 id="confirmModalTitle" class="text-lg md:text-xl font-bold mb-2 text-white">Confirm Action</h2>
+            <p id="confirmModalText" class="text-white/60 mb-8 font-medium text-xs md:text-sm">Are you sure?</p>
+            <div class="flex gap-4">
+                <button class="close-modal-btn flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold btn-anim border border-white/10 text-sm md:text-base">Cancel</button>
+                <button id="confirmModalAction" class="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold btn-anim shadow-lg transition-colors text-sm md:text-base">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Playlist Selection Modal -->
+    <div id="playlistSelectModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden opacity-0 transition-all duration-300 px-4">
+        <div class="app-glass rounded-3xl p-6 w-full max-w-sm flex flex-col">
+            <h2 class="text-lg md:text-xl font-bold mb-4 text-white text-center">Add to Playlist</h2>
+            <div id="playlistSelectList" class="max-h-60 overflow-y-auto hide-scrollbar space-y-2 mb-4"></div>
+            <button class="close-modal-btn w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold btn-anim border border-white/5 text-sm md:text-base">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Bottom Context Sheet (3-Dots Menu) -->
+    <div id="bottomSheet" class="fixed inset-x-0 bottom-0 h-full bg-transparent z-50 pointer-events-none flex flex-col justify-end hidden">
+        <div id="bottomSheetOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-auto z-40"></div>
+        <div id="bottomSheetContent" class="app-glass w-full max-w-2xl mx-auto rounded-t-[2rem] md:rounded-t-[2.5rem] p-6 md:p-8 transform translate-y-full transition-transform duration-300 pointer-events-auto border-b-0 pb-10 md:pb-12 shadow-2xl relative z-50">
+            <div class="w-12 md:w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+            <div class="flex items-center gap-4 mb-6 md:mb-8 border-b border-white/10 pb-6">
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-white/5 overflow-hidden flex items-center justify-center shrink-0 border border-white/10 shadow-lg relative">
+                    <img id="sheetArt" src="" class="w-full h-full object-cover hidden absolute inset-0 z-10">
+                    <div id="sheetFallback" class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent flex items-center justify-center z-0"><span class="text-2xl md:text-3xl filter drop-shadow-md">🌸</span></div>
+                </div>
+                <div class="overflow-hidden">
+                    <h3 id="sheetTitle" class="text-xl md:text-2xl font-extrabold text-white truncate better-text-shadow tracking-wide">Song Title</h3>
+                    <p id="sheetArtist" class="text-white/60 font-medium text-sm md:text-base truncate mt-1">Artist Name</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <button id="actionPlayNext" class="w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="corner-down-right" class="w-5 h-5 md:w-6 md:h-6 text-white/60"></i> Play Next</button>
+                <button id="actionAddQueue" class="w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="list-plus" class="w-5 h-5 md:w-6 md:h-6 text-white/60"></i> Add to Queue</button>
+                <button id="actionAddPlaylist" class="w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-white font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="folder-plus" class="w-5 h-5 md:w-6 md:h-6 text-white/60"></i> Add to Playlist</button>
+                <button id="actionRemovePlaylist" class="hidden w-full flex items-center gap-4 p-3 md:p-4 rounded-xl hover:bg-white/10 text-rose-400 font-bold btn-anim text-base md:text-lg transition-colors"><i data-lucide="folder-minus" class="w-5 h-5 md:w-6 md:h-6 text-rose-400"></i> Remove from Playlist</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container (Responsive) -->
+    <div id="mainAppContainer" class="app-glass w-full h-full md:w-[95vw] md:h-[85vh] md:max-w-6xl md:rounded-[2.5rem] relative flex flex-col overflow-hidden z-10 md:shadow-2xl">
+        
+        <div id="petals-container" class="absolute inset-0 z-0 overflow-hidden pointer-events-none"></div>
+
+        <div class="flex flex-1 overflow-hidden relative z-10">
+            
+            <!-- Sidebar Mobile Overlay -->
+            <div id="sidebarOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden opacity-0 transition-opacity duration-300"></div>
+
+            <!-- Sidebar -->
+            <aside id="sidebar" class="w-64 shrink-0 panel-glass flex flex-col py-8 px-4 z-50 absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 bg-[#050508]/95 md:bg-transparent backdrop-blur-3xl md:backdrop-blur-none border-r border-white/10 md:border-none">
+                <button id="closeSidebarBtn" class="md:hidden absolute top-6 right-4 text-white/50 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+
+                <div class="flex items-center gap-3 mb-10 px-2">
+                    <span class="text-3xl logo-animated" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));">🌸</span>
+                    <h1 class="text-2xl font-bold text-white tracking-tight text-inherit">Blossom</h1>
+                </div>
+
+                <nav class="flex-1 overflow-y-auto hide-scrollbar px-2 space-y-1.5">
+                    <p class="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold mb-3 ml-1">Library</p>
+                    <button id="navHome" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-white font-bold bg-white/10 border border-white/5 btn-anim nav-btn shadow-sm" data-view="home">
+                        <i data-lucide="search" class="w-5 h-5"></i> Explore Cloud
+                    </button>
+                    <button id="navFavs" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/60 hover:text-white font-medium transition btn-anim nav-btn border border-transparent" data-view="favs">
+                        <i data-lucide="heart" class="w-5 h-5"></i> Liked Songs
+                    </button>
+
+                    <div class="mt-8 mb-3 flex justify-between items-center ml-1">
+                        <span class="text-[11px] uppercase tracking-[0.2em] text-white/40 font-semibold">Playlists</span>
+                        <button id="createPlaylistBtn" class="text-white/40 hover:text-white transition p-1.5 rounded-md hover:bg-white/10"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                    </div>
+                    <div id="sidebarPlaylists" class="space-y-1.5"></div>
+                </nav>
+
+                <div class="mt-4 border-t border-white/10 pt-6 px-2">
+                    <button onclick="if(window.innerWidth < 768) toggleSidebar(true); showModal('feedbackModal')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 font-medium transition btn-anim mb-4 border border-transparent">
+                        <i data-lucide="message-square" class="w-4 h-4"></i> <span class="text-sm">Send Feedback</span>
+                    </button>
+
+                    <div class="flex items-center justify-between px-1 text-inherit">
+                        <div class="flex flex-col">
+                            <p class="text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2 font-semibold">Created by Varun Kulkarni</p>
+                            <div class="flex gap-4">
+                                <a href="https://www.instagram.com/varun_kulkarni__/" target="_blank" class="text-white/40 hover:text-white btn-anim"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                                <a href="https://github.com/VarunKulkarni15" target="_blank" class="text-white/40 hover:text-white btn-anim"><i data-lucide="github" class="w-4 h-4"></i></a>
+                            </div>
+                        </div>
+                        <button id="privacyShieldBtn" onclick="openDisclaimer()" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all btn-anim shadow-sm ml-2 shrink-0" title="Privacy & Disclaimer">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 flex flex-col p-4 md:p-10 overflow-hidden relative w-full">
+                <header class="flex justify-between items-start mb-4 md:mb-6 shrink-0 z-20">
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-3 mb-1">
+                            <button id="openSidebarBtn" class="md:hidden text-white/70 hover:text-white transition"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                            <p id="greetingText" class="text-white/60 font-medium text-xs md:text-sm tracking-wide">Good evening ✨</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <h2 id="mainHeaderTitle" class="text-2xl md:text-4xl font-extrabold text-white better-text-shadow tracking-tight">Explore</h2>
+                            
+                            <div id="playlistActions" class="hidden items-center gap-1">
+                                <button id="editPlaylistBtn" class="text-white/40 hover:text-white p-2 rounded-lg hover:bg-white/10 transition btn-anim shadow-sm" title="Rename Playlist"><i data-lucide="pencil" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+                                <button id="deletePlaylistBtn" class="text-white/40 hover:text-rose-500 p-2 rounded-lg hover:bg-white/10 transition btn-anim shadow-sm" title="Delete Playlist"><i data-lucide="trash-2" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 md:gap-4 mt-1 md:mt-0 relative">
+                        <div id="searchBox" class="search-container flex items-center shadow-md relative z-20">
+                            <button id="searchTrigger" class="w-10 h-10 flex items-center justify-center shrink-0 text-white/70 hover:text-white transition"><i data-lucide="search" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+                            <input type="text" id="searchInput" placeholder="Search global database..." class="bg-transparent border-none focus:ring-0 text-white font-medium text-sm w-full outline-none pr-3 opacity-0 pointer-events-none transition-opacity duration-300 placeholder-white/30">
+                        </div>
+                        
+                        <button id="settingsBtn" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/70 hover:text-white btn-anim border border-white/10 shadow-md hover:bg-white/10 shrink-0" title="Themes & Settings"><i data-lucide="settings" class="w-4 h-4 md:w-5 md:h-5"></i></button>
+                    </div>
+                </header>
+
+                <!-- 🚀 THE NATIVE UI WIDGET (Inside the main container, not floating) -->
+                <div id="engineTabsContainer" class="hidden justify-center mb-6 shrink-0 transition-opacity duration-300 opacity-0">
+                    <div class="flex bg-black/40 backdrop-blur-md p-1 rounded-xl border border-white/10 shadow-inner">
+                        <button id="tabSaavn" class="px-5 py-2 rounded-lg bg-white/10 text-white font-bold text-xs md:text-sm transition-all shadow-sm border border-white/10 flex items-center gap-2 btn-anim">
+                            <i data-lucide="music" class="w-4 h-4"></i> Saavn Cloud
+                        </button>
+                        <button id="tabYT" class="px-5 py-2 rounded-lg text-white/50 hover:text-white font-medium text-xs md:text-sm transition-all border border-transparent flex items-center gap-2 btn-anim">
+                            <i data-lucide="youtube" class="w-4 h-4"></i> YT Fallback
+                        </button>
+                    </div>
+                </div>
+
+                <div id="songList" class="flex-1 overflow-y-auto hide-scrollbar space-y-2 md:space-y-2.5 pr-2 md:pr-4 pb-4">
+                    <div class="h-full flex flex-col items-center justify-center text-white/20">
+                        <i data-lucide="cloud-search" class="w-16 h-16 md:w-20 md:h-20 mb-4 opacity-20"></i>
+                        <p class="italic text-base md:text-lg font-medium text-center">Search for an artist or song.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Responsive Footer Player -->
+        <footer class="h-20 md:h-28 panel-glass border-t border-white/10 px-4 md:px-8 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.4)] z-30 relative group">
+            <input type="range" id="mobileProgress" class="md:hidden absolute top-0 left-0 w-full h-[3px] bg-white/10 accent-rose-400 appearance-none cursor-pointer z-40 m-0 p-0" value="0" style="transform: translateY(-50%);">
+
+            <div class="flex items-center gap-3 md:gap-5 w-1/2 md:w-1/3">
+                <div onclick="openFullScreen()" class="w-12 h-12 md:w-16 md:h-16 rounded-xl bg-black/40 flex items-center justify-center overflow-hidden border border-white/5 shadow-lg shrink-0 relative cursor-pointer btn-anim hover:border-white/20 transition-colors">
+                    <img id="trackArt" class="w-full h-full object-cover hidden absolute inset-0 z-10 transition-all duration-300 group-hover:brightness-50">
+                    <div id="trackFallback" class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent flex items-center justify-center z-0 transition-all duration-300 group-hover:brightness-50"><span class="text-xl md:text-3xl filter drop-shadow-md">🌸</span></div>
+                    <i data-lucide="maximize-2" class="w-5 h-5 md:w-6 md:h-6 text-white absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block"></i>
+                </div>
+                <div class="overflow-hidden flex-1 cursor-pointer" onclick="openFullScreen()">
+                    <h4 id="trackTitle" class="text-white font-extrabold truncate text-sm md:text-lg tracking-wide better-text-shadow hover:text-rose-400 transition-colors">No track</h4>
+                    <p id="trackArtist" class="text-white/50 font-medium text-xs md:text-sm truncate mt-0.5">-</p>
+                </div>
+                <button id="trackFavBtn" class="hidden md:block ml-2 btn-anim shrink-0 hover:scale-110 transition-transform"><i id="trackFavIcon" data-lucide="heart" class="w-6 h-6 text-white/30"></i></button>
+            </div>
+
+            <div class="flex flex-col items-center justify-center md:gap-3 w-1/2 md:w-1/3">
+                <div class="flex items-center gap-4 md:gap-8 justify-end w-full md:justify-center">
+                    <button onclick="playPrev()" id="prevBtn" class="hidden md:block text-white/60 hover:text-white btn-anim hover:scale-110"><i data-lucide="skip-back" class="w-6 h-6 fill-current"></i></button>
+                    <button onclick="togglePlay()" id="playBtn" class="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center btn-anim hover:scale-105 transition-transform play-btn-bg shrink-0">
+                        <i data-lucide="play" id="playIcon" class="w-5 h-5 md:w-7 md:h-7 fill-current translate-x-0.5"></i>
+                        <i data-lucide="pause" id="pauseIcon" class="w-5 h-5 md:w-7 md:h-7 fill-current hidden"></i>
+                    </button>
+                    <button onclick="playNext()" id="nextBtn" class="text-white/60 hover:text-white btn-anim hover:scale-110"><i data-lucide="skip-forward" class="w-5 h-5 md:w-6 md:h-6 fill-current"></i></button>
+                </div>
+                <div class="hidden md:flex w-full items-center gap-3 text-[11px] text-white/50 font-medium max-w-md">
+                    <span id="currTime" class="w-10 text-right">0:00</span>
+                    <input type="range" id="progress" class="flex-1 accent-white h-1.5 bg-white/10 rounded-full cursor-pointer outline-none" value="0">
+                    <span id="totalTime" class="w-10">0:00</span>
+                </div>
+            </div>
+
+            <div class="hidden md:flex w-1/3 justify-end items-center gap-4 pr-2">
+                <i data-lucide="volume-2" class="w-5 h-5 text-white/50"></i>
+                <input type="range" id="volumeSlider" class="w-28 accent-white h-1.5 bg-white/10 rounded-full cursor-pointer outline-none" min="0" max="100" value="80">
+            </div>
+        </footer>
+    </div>
+
+    <!-- =========================================
+         THE ULTIMATE FLEX: CINEMATIC FULL SCREEN
+         ========================================= -->
+    <div id="fullScreenPlayer" class="fixed inset-0 z-[100] bg-black hidden flex-col translate-y-full">
+        <img id="fsBg" src="" class="absolute inset-0 w-full h-full object-cover opacity-40 blur-3xl scale-110 transition-all duration-1000">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/60 to-[#050508] fs-bg-overlay"></div>
+        
+        <div class="relative z-10 flex justify-between items-center p-6 md:p-8 shrink-0">
+            <button onclick="closeFullScreen()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white transition-all btn-anim backdrop-blur-md border border-white/10"><i data-lucide="chevron-down" class="w-6 h-6 md:w-7 md:h-7"></i></button>
+            <div class="flex flex-col items-center">
+                <span class="text-white/40 font-extrabold tracking-[0.3em] uppercase text-[9px] md:text-[10px] mb-1">Now Playing</span>
+                <span id="fsContext" class="text-white/80 font-medium text-[10px] md:text-xs tracking-widest">Global Cloud</span>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white transition-all btn-anim backdrop-blur-md border border-white/10"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button>
+        </div>
+
+        <div class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 md:p-8 w-full max-w-4xl mx-auto min-h-0">
+            <div class="w-[65vw] h-[65vw] max-w-[350px] max-h-[350px] md:w-[45vh] md:h-[45vh] md:max-w-[500px] md:max-h-[500px] rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)] border border-white/20 mb-6 md:mb-10 bg-black/40 flex items-center justify-center relative shrink-0">
+                <img id="fsArt" src="" class="w-full h-full object-cover hidden absolute inset-0 z-10">
+                <div id="fsFallback" class="absolute inset-0 flex items-center justify-center z-0 text-6xl md:text-7xl filter drop-shadow-2xl hidden">🌸</div>
+            </div>
+            <div class="w-full flex flex-col items-center shrink-0 px-4 md:px-8">
+                <h2 id="fsTitle" class="text-2xl md:text-5xl font-extrabold text-white text-center mb-1 md:mb-2 better-text-shadow tracking-tight truncate w-full">No track playing</h2>
+                <p id="fsArtist" class="text-base md:text-2xl text-white/60 font-medium text-center truncate w-full">Select a track from the library</p>
+            </div>
+            <div class="w-full max-w-2xl mt-6 md:mt-12 flex flex-col items-center shrink-0 px-2 md:px-0">
+                <div class="w-full flex items-center gap-3 md:gap-5 text-xs md:text-sm text-white/60 font-medium mb-6 md:mb-10">
+                    <span id="fsCurrTime" class="w-10 text-right">0:00</span>
+                    <input type="range" id="fsProgress" class="flex-1 accent-white h-1.5 md:h-2 bg-white/20 rounded-full cursor-pointer outline-none transition-all" value="0">
+                    <span id="fsTotalTime" class="w-10">0:00</span>
+                </div>
+                <div class="flex items-center gap-8 md:gap-12">
+                    <button onclick="playPrev()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-back" class="w-8 h-8 md:w-10 md:h-10 fill-current"></i></button>
+                    <button onclick="togglePlay()" id="fsPlayBtn" class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-white text-black flex items-center justify-center btn-anim hover:scale-105 transition-transform shadow-[0_0_30px_rgba(255,255,255,0.3)] md:shadow-[0_0_40px_rgba(255,255,255,0.4)]">
+                        <i data-lucide="play" id="fsPlayIcon" class="w-8 h-8 md:w-12 md:h-12 fill-current translate-x-1"></i>
+                        <i data-lucide="pause" id="fsPauseIcon" class="w-8 h-8 md:w-12 md:h-12 fill-current hidden"></i>
+                    </button>
+                    <button onclick="playNext()" class="text-white/70 hover:text-white btn-anim hover:scale-110 transition-transform"><i data-lucide="skip-forward" class="w-8 h-8 md:w-10 md:h-10 fill-current"></i></button>
+                </div>
+            </div>
+            <div class="h-4 md:h-0 w-full shrink-0"></div>
+        </div>
+    </div>
+
+    <!-- HTML5 AUDIO PLAYER (For Saavn) -->
+    <audio id="mainAudio"></audio>
+
+    <!-- 🌸 PETAL AI: Floating Widget & Beta Tag 🌸 -->
+    <button id="aiChatToggle" class="fixed bottom-28 right-6 md:right-10 w-14 h-14 rounded-full active-gradient shadow-[0_0_20px_rgba(255,94,98,0.4)] flex items-center justify-center z-[155] hover:scale-110 transition-all duration-300">
+        <span class="text-2xl drop-shadow-md">🌸</span>
+        <span class="absolute -top-2 -right-2 bg-white text-rose-500 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md shadow-md animate-pulse">BETA</span>
+    </button>
+
+    <div id="aiChatWindow" class="fixed bottom-44 right-6 md:right-10 w-[85vw] max-w-[350px] h-[480px] app-glass rounded-3xl border border-white/20 shadow-2xl z-[155] flex flex-col hidden opacity-0 scale-95 transition-all duration-300" style="transform-origin: bottom right; transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);">
+        
+        <!-- Header -->
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-3xl shrink-0">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">🌸</span>
+                <h3 class="text-white font-bold text-sm tracking-wide ml-1">Petal AI</h3>
+                <span class="bg-white/10 text-white/50 text-[10px] px-2 py-0.5 rounded-full ml-1 font-medium">BETA</span>
+            </div>
+            <button id="aiChatClose" class="text-white/50 hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        
+        <!-- Chat Area -->
+        <div id="aiChatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 hide-scrollbar flex flex-col">
+            <div class="bg-white/10 text-white/90 w-fit max-w-[85%] p-3.5 rounded-2xl rounded-tl-sm border border-white/5 self-start text-sm">
+                sup twin 💅🏼 drop a vibe or ask me to play a song. lowkey hoping your taste isn't trash today 💀
+            </div>
+        </div>
+        
+        <!-- Input -->
+        <div class="p-3 border-t border-white/10 bg-black/40 rounded-b-3xl flex gap-2 items-center shrink-0">
+            <input type="text" id="aiChatInput" placeholder="Tell Petal to play something..." class="flex-1 bg-transparent border-none text-white outline-none text-sm placeholder-white/30 px-2" onkeypress="if(event.key === 'Enter') sendAiMessage()">
+            <button onclick="sendAiMessage()" class="w-9 h-9 rounded-full active-gradient flex items-center justify-center shrink-0 hover:scale-110 transition-transform">
+                <i data-lucide="send" class="w-4 h-4 text-white -ml-0.5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- INVISIBLE YOUTUBE ENGINE (Bypasses Proxies) -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
