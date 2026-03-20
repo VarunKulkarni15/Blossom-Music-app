@@ -1,3 +1,33 @@
+// 🚀 THE BLOSSOM V2 CINEMATIC REDIRECT
+if (window.location.hostname.includes("github.io")) {
+    document.addEventListener("DOMContentLoaded", () => {
+        // Nuke the old HTML and inject a beautiful Liquid Glass countdown screen
+        document.body.innerHTML = `
+            <div style="position: fixed; inset: 0; z-index: 99999; background-color: #050508; background-image: radial-gradient(circle at 50% 100%, #750e32 0%, transparent 55%); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; text-align: center; padding: 20px;">
+                <span style="font-size: 80px; filter: drop-shadow(0 0 25px rgba(251,113,133,0.4));">🌸</span>
+                <h1 style="font-size: 32px; font-weight: 800; margin-top: 24px; margin-bottom: 12px; letter-spacing: -0.5px;">Blossom leveled up.</h1>
+                <p style="color: rgba(255,255,255,0.6); max-width: 400px; margin-bottom: 40px; font-size: 15px; line-height: 1.6;">We migrated to a dedicated cloud server for 10x better performance. Warping you to the new domain in...</p>
+                
+                <div style="font-size: 72px; font-weight: 900; color: #fb7185; margin-bottom: 40px; text-shadow: 0 0 30px rgba(251,113,133,0.3);" id="countdown">5</div>
+                
+                <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 10px;">Taking too long?</p>
+                <a href="https://blossom-music-app.onrender.com" style="color: white; font-weight: 700; text-decoration: none; padding: 14px 28px; border: 1px solid rgba(251, 113, 133, 0.5); border-radius: 16px; background: rgba(251, 113, 133, 0.15); backdrop-filter: blur(10px); box-shadow: 0 10px 25px -5px rgba(251,113,133,0.3); transition: all 0.3s;">Take me there now ✨</a>
+            </div>
+        `;
+
+        let timeLeft = 5;
+        const timer = setInterval(() => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                document.getElementById('countdown').innerText = timeLeft;
+            } else {
+                clearInterval(timer);
+                window.location.replace("https://blossom-music-app.onrender.com");
+            }
+        }, 1000);
+    });
+}
+
 lucide.createIcons();
 
         // --- SPLASH SCREEN & QUOTES ---
