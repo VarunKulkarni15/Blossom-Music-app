@@ -19,6 +19,14 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// --- Domain Redirect Middleware ---
+app.use((req, res, next) => {
+    if (req.hostname && req.hostname.includes('.onrender.com')) {
+        return res.redirect(301, 'https://blossom.varunkulkarni.dpdns.org' + req.originalUrl);
+    }
+    next();
+});
+
 // --- Serve Static Frontend Files ---
 // This serves index.html, app.js, styles.css, etc.
 app.use(express.static(path.join(__dirname)));
