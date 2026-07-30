@@ -12,6 +12,14 @@ const fetch = require('node-fetch');
 const path = require('path');
 const saavn = require('saavnapi').default;
 const rateLimit = require('express-rate-limit');
+const fs = require('fs');
+const ytdl = require('@distube/ytdl-core');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static');
+ffmpeg.setFfmpegPath(ffmpegPath);
+const NodeID3 = require('node-id3');
+const archiver = require('archiver');
+const pLimit = require('p-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -230,6 +238,9 @@ app.get('/api/saavn-suggest', async (req, res) => {
     }
 });
 
+
+// --- DOWNLOAD ENGINE ---
+require('./downloadEngine')(app);
 
 // --- Fallback: Serve index.html for any unknown route (SPA support) ---
 app.get('*', (req, res) => {

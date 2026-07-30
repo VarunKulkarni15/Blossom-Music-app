@@ -318,7 +318,13 @@ lucide.createIcons();
             } else {
                 searchBox.style.display = "none";
                 engineTabsContainer.classList.add('hidden', 'opacity-0');
-                if(viewStr === 'favs') mainHeaderTitle.innerText = "Liked Songs";
+                playlistActions.classList.add('hidden'); playlistActions.classList.remove('flex');
+                document.getElementById('likedSongsActions').classList.add('hidden'); document.getElementById('likedSongsActions').classList.remove('flex');
+                
+                if(viewStr === 'favs') {
+                    mainHeaderTitle.innerText = "Liked Songs";
+                    document.getElementById('likedSongsActions').classList.remove('hidden'); document.getElementById('likedSongsActions').classList.add('flex');
+                }
                 else if(viewStr.startsWith('playlist:')) {
                     mainHeaderTitle.innerText = viewStr.substring(9);
                     playlistActions.classList.remove('hidden'); playlistActions.classList.add('flex');
@@ -1066,5 +1072,108 @@ lucide.createIcons();
             else if (e.code === 'Escape') { closeFullScreen(); hideModals(); }
         });
 
+        // --- TOAST NOTIFICATIONS ---
+        let toastTimeout;
+        window.showToast = function(message, type = 'success') {
+            const toast = document.getElementById('toastNotification');
+            const msg = document.getElementById('toastMessage');
+            const icon = document.getElementById('toastIcon');
+            
+            msg.innerText = message;
+            if (type === 'loading') {
+                toast.className = "fixed top-5 left-1/2 transform -translate-x-1/2 z-[200] bg-white/20 backdrop-blur-xl border border-white/10 text-white font-bold px-6 py-3 rounded-full shadow-2xl transition-all duration-300 flex items-center gap-3";
+                icon.innerHTML = `<div class="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>`;
+            } else if (type === 'error') {
+                toast.className = "fixed top-5 left-1/2 transform -translate-x-1/2 z-[200] bg-rose-600 text-white font-bold px-6 py-3 rounded-full shadow-2xl transition-all duration-300 flex items-center gap-3";
+                icon.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i>`;
+            } else {
+                toast.className = "fixed top-5 left-1/2 transform -translate-x-1/2 z-[200] bg-emerald-500 text-white font-bold px-6 py-3 rounded-full shadow-2xl transition-all duration-300 flex items-center gap-3";
+                icon.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i>`;
+            }
+            lucide.createIcons();
+            
+            toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+            
+            clearTimeout(toastTimeout);
+            if (type !== 'loading') {
+                toastTimeout = setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+                }, 3000);
+            }
+        }
 
+        // --- DOWNLOAD ENGINE ---
+        document.getElementById('actionDownload').onclick = () => {
+            if (!contextSongId) return;
+            const song = findSongObj(contextSongId);
+            if (song) downloadSong(song);
+            closeMenu();
+        };
+        
+        document.getElementById('downloadLikedBtn').onclick = () => {
+            const favSongs = library.filter(s => s.fav);
+            if (favSongs.length === 0) return showToast("No liked songs to download", "error");
+            downloadBatch(favSongs, "Liked_Songs");
+        };
 
+        document.getElementById('downloadPlaylistBtn').onclick = () => {
+            const pName = currentView.substring(9);
+            const pSongs = playlists[pName] || [];
+            if (pSongs.length === 0) return showToast("Playlist is empty", "error");
+            const fullSongs = pSongs.map(id => findSongObj(id)).filter(s => s);
+            downloadBatch(fullSongs, pName);
+        };
+
+        async function downloadSong(song) {
+            showToast(`Extracting ${song.title}...`, 'loading');
+            try {
+                const res = await fetch('/api/download/song', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(song)
+                });
+                
+                if (!res.ok) throw new Error("Download failed");
+                
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${song.title} - ${song.artist}.mp3`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                showToast("Download Complete!", "success");
+            } catch (err) {
+                console.error(err);
+                showToast("Failed to extract audio", "error");
+            }
+        }
+
+        async function downloadBatch(songs, folderName) {
+            showToast(`Zipping ${songs.length} songs... This may take a while!`, 'loading');
+            try {
+                const res = await fetch('/api/download/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ songs, folderName })
+                });
+                
+                if (!res.ok) throw new Error("Batch download failed");
+                
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${folderName.replace(/\s+/g, '_')}_Blossom.zip`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                showToast("Zip File Downloaded!", "success");
+            } catch (err) {
+                console.error(err);
+                showToast("Batch download failed", "error");
+            }
+        }
