@@ -124,12 +124,23 @@ app.get('/api/saavn-search', async (req, res) => {
 
     try {
         const searchResults = await saavn.search.searchAll(query);
-        if (!searchResults || !searchResults.topQuery || !searchResults.topQuery.results || searchResults.topQuery.results.length === 0) {
-            return res.json([]);
+        
+        // Extract songs from both topQuery and songs lists
+        let songResults = [];
+        
+        if (searchResults && searchResults.topQuery && searchResults.topQuery.results) {
+            songResults = songResults.concat(searchResults.topQuery.results.filter(item => item.type === 'song'));
         }
         
-        // Filter out only songs
-        const songResults = searchResults.topQuery.results.filter(item => item.type === 'song');
+        if (searchResults && searchResults.songs && searchResults.songs.results) {
+            songResults = songResults.concat(searchResults.songs.results.filter(item => item.type === 'song'));
+        }
+
+        // Deduplicate songs by id
+        songResults = songResults.filter((song, index, self) => 
+            index === self.findIndex((t) => (t.id === song.id))
+        );
+
         if (songResults.length === 0) {
              return res.json([]);
         }
