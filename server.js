@@ -11,6 +11,7 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 const path = require('path');
 const saavn = require('saavnapi').default;
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,18 @@ const PORT = process.env.PORT || 3000;
 // --- Middleware ---
 app.use(cors());
 app.use(express.json());
+
+// --- Security / Bot Protection ---
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' }
+});
+
+// Apply rate limiting to all /api routes
+app.use('/api/', apiLimiter);
 
 // --- Domain Redirect Middleware ---
 app.use((req, res, next) => {
@@ -64,7 +77,7 @@ app.get('/api/youtube-search', async (req, res) => {
 
     while (attempts < YT_KEYS.length) {
         const activeKey = YT_KEYS[currentKeyIndex];
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query + ' song')}&type=video&videoCategoryId=10&safeSearch=strict&key=${activeKey}`;
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=15&q=${encodeURIComponent(query + ' official audio')}&type=video&videoCategoryId=10&safeSearch=strict&key=${activeKey}`;
 
         try {
             const ytRes = await fetch(url);
@@ -123,30 +136,19 @@ app.get('/api/saavn-search', async (req, res) => {
     }
 
     try {
-        const searchResults = await saavn.search.searchAll(query);
+        // Fetch 30 search results from JioSaavn's official internal API
+        const saavnRes = await fetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&q=${encodeURIComponent(query)}&n=30&p=1&_format=json&_marker=0&ctx=android`);
+        if (!saavnRes.ok) throw new Error('Failed to fetch from JioSaavn');
         
-        // Extract songs from both topQuery and songs lists
-        let songResults = [];
+        const saavnData = await saavnRes.json();
+        const searchResults = saavnData.results || [];
         
-        if (searchResults && searchResults.topQuery && searchResults.topQuery.results) {
-            songResults = songResults.concat(searchResults.topQuery.results.filter(item => item.type === 'song'));
-        }
-        
-        if (searchResults && searchResults.songs && searchResults.songs.results) {
-            songResults = songResults.concat(searchResults.songs.results.filter(item => item.type === 'song'));
-        }
-
-        // Deduplicate songs by id
-        songResults = songResults.filter((song, index, self) => 
-            index === self.findIndex((t) => (t.id === song.id))
-        );
-
-        if (songResults.length === 0) {
+        if (searchResults.length === 0) {
              return res.json([]);
         }
 
-        // Extract IDs and fetch full song details (which includes streaming URLs)
-        const songIds = songResults.map(song => song.id);
+        // Extract IDs and fetch full song details (which includes streaming URLs) via saavnapi
+        const songIds = searchResults.map(song => song.id);
         const detailedSongs = await saavn.songs.getSongByIds({ songIds });
         
         const results = detailedSongs.map(song => {
@@ -177,10 +179,54 @@ app.get('/api/saavn-search', async (req, res) => {
             };
         });
 
-        return res.json(results);
-    } catch (err) {
-        console.error('[Saavn] Search failed:', err.message);
-        return res.status(500).json({ error: 'Failed to reach Saavn API.' });
+        res.json(results);
+    } catch (e) {
+        console.error('[SAAVN SEARCH]', e);
+        res.status(500).json({ error: 'Failed to search Saavn.' });
+    }
+});
+
+// ================================================
+// 🎵 ROUTE 1.6: /api/saavn-suggest
+// ================================================
+// Accepts: GET /api/saavn-suggest?id=...
+// Returns: Array of similar Saavn song objects
+// ================================================
+app.get('/api/saavn-suggest', async (req, res) => {
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: 'Missing id parameter.' });
+
+    try {
+        const suggestions = await saavn.songs.getSongSuggestions({ songId: id, limit: 10 });
+        if (!suggestions || suggestions.length === 0) return res.json([]);
+
+        const songIds = suggestions.map(song => song.id);
+        const detailedSongs = await saavn.songs.getSongByIds({ songIds });
+        
+        const results = detailedSongs.map(song => {
+            let audioUrl = '';
+            if (song.downloadUrl && song.downloadUrl.length > 0) audioUrl = song.downloadUrl[song.downloadUrl.length - 1].url;
+            let imageUrl = '';
+            if (song.image && song.image.length > 0) imageUrl = song.image[song.image.length - 1].url;
+            let artistName = 'Unknown Artist';
+            if (song.artists && song.artists.primary && song.artists.primary.length > 0) {
+                artistName = song.artists.primary.map(a => a.name).join(', ');
+            }
+
+            return {
+                id: song.id,
+                title: song.name,
+                artist: artistName,
+                cover: imageUrl,
+                duration: song.duration,
+                url: audioUrl,
+                source: 'saavn'
+            };
+        });
+        res.json(results);
+    } catch (e) {
+        console.error('[SAAVN SUGGEST]', e);
+        res.status(500).json({ error: 'Failed to fetch suggestions.' });
     }
 });
 

@@ -594,12 +594,40 @@ lucide.createIcons();
 
         function isFav(id) { return library.find(x => x.id === id)?.fav || false; }
 
-        window.toggleFav = function(e, id) {
+        window.toggleFav = async function(e, id) {
             e.stopPropagation();
             let songInLib = library.find(x => x.id === id);
-            if (songInLib) songInLib.fav = !songInLib.fav;
-            else { const s = findSongObj(id); if(s) library.push({...s, fav: true}); }
+            let targetFavState = false;
+            
+            if (songInLib) {
+                targetFavState = !songInLib.fav;
+                songInLib.fav = targetFavState;
+            } else { 
+                const s = findSongObj(id); 
+                if(s) { 
+                    library.push({...s, fav: true}); 
+                    songInLib = library[library.length - 1];
+                    targetFavState = true; 
+                } 
+            }
+            
             saveLibrary(); renderList(); if(id === activeSongId) updatePlayerUI();
+
+            // OFFLINE CACHING
+            if (targetFavState && songInLib && songInLib.url && songInLib.source !== 'youtube') {
+                try {
+                    const existingBlob = await localforage.getItem(`audio_${id}`);
+                    if (!existingBlob) {
+                        const res = await fetch(songInLib.url);
+                        if (res.ok) {
+                            const blob = await res.blob();
+                            await localforage.setItem(`audio_${id}`, blob);
+                        }
+                    }
+                } catch(err) { console.error('Failed to cache audio', err); }
+            } else if (!targetFavState) {
+                try { await localforage.removeItem(`audio_${id}`); } catch(e){}
+            }
         };
 
         // CAROUSEL GENERATOR 
@@ -847,7 +875,18 @@ lucide.createIcons();
                 activeEngineState = 'saavn';
                 if (ytPlayerReadyState && ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo(); // Kill YT stream
                 
-                audio.src = s.url;
+                try {
+                    const cachedAudio = await localforage.getItem(`audio_${s.id}`);
+                    if (cachedAudio) {
+                        audio.src = URL.createObjectURL(cachedAudio);
+                        console.log('Playing from offline cache:', s.id);
+                    } else {
+                        audio.src = s.url;
+                    }
+                } catch(err) {
+                    audio.src = s.url;
+                }
+                
                 audio.play().catch(e => { console.error("Playback failed", e); });
                 playing = true;
                 updatePlayerUI();
@@ -933,10 +972,27 @@ lucide.createIcons();
             }
         }
 
-        window.playNext = function() {
+        window.playNext = async function() {
             if(currentQueue.length === 0) return;
             let idx = currentQueue.findIndex(x => x.id === activeSongId);
             if (idx === -1) idx = 0;
+
+            // Spotify-like Autoplay: If we're at the last song, fetch suggestions
+            if (idx === currentQueue.length - 1 && activeSongId) {
+                try {
+                    const res = await fetch(`/api/saavn-suggest?id=${activeSongId}`);
+                    if (res.ok) {
+                        const suggestions = await res.json();
+                        const newSongs = suggestions.filter(s => !currentQueue.find(q => q.id === s.id));
+                        if (newSongs.length > 0) {
+                            currentQueue.push(...newSongs);
+                            newSongs.forEach(s => { if(!library.find(x => x.id === s.id)) library.push({...s, fav:false}); });
+                            renderList();
+                        }
+                    }
+                } catch(e) { console.error('Autoplay failed', e); }
+            }
+
             playSong(currentQueue[(idx + 1) % currentQueue.length].id);
         }
 
