@@ -10,7 +10,7 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -391,7 +391,7 @@
                     <h4 id="trackTitle" class="text-white font-extrabold truncate text-sm md:text-lg tracking-wide better-text-shadow hover:text-rose-400 transition-colors">No track</h4>
                     <p id="trackArtist" class="text-white/50 font-medium text-xs md:text-sm truncate mt-0.5">-</p>
                 </div>
-                <button id="trackFavBtn" class="hidden md:block ml-2 btn-anim shrink-0 hover:scale-110 transition-transform"><i id="trackFavIcon" data-lucide="heart" class="w-6 h-6 text-white/30"></i></button>
+                <button id="trackFavBtn" onclick="if(activeSongId) toggleFav(event, activeSongId)" class="hidden md:block ml-2 btn-anim shrink-0 hover:scale-110 transition-transform"><i id="trackFavIcon" data-lucide="heart" class="w-6 h-6 text-white/30"></i></button>
             </div>
 
             <div class="flex flex-col items-center justify-center md:gap-3 w-1/2 md:w-1/3">
