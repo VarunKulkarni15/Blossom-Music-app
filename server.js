@@ -230,54 +230,6 @@ app.get('/api/saavn-suggest', async (req, res) => {
     }
 });
 
-// ================================================
-// 🌸 ROUTE 2: /api/petal-chat
-// ================================================
-// Accepts: POST /api/petal-chat with JSON body { messages: [...] }
-// Returns: Groq API JSON response (proxied directly)
-// ================================================
-
-app.post('/api/petal-chat', async (req, res) => {
-    const { messages, temperature, max_tokens } = req.body;
-
-    if (!messages || !Array.isArray(messages)) {
-        return res.status(400).json({ error: 'Missing or invalid messages array.' });
-    }
-
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
-    if (!GROQ_API_KEY) {
-        return res.status(500).json({ error: 'Groq API key not configured on server.' });
-    }
-
-    try {
-        const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${GROQ_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
-                messages,
-                temperature: temperature ?? 0.8,
-                max_tokens: max_tokens ?? 150,
-            }),
-        });
-
-        const data = await groqRes.json();
-
-        if (!groqRes.ok) {
-            console.error('[Groq] API Error:', data);
-            return res.status(groqRes.status).json(data);
-        }
-
-        return res.json(data);
-
-    } catch (err) {
-        console.error('[Groq] Fetch failed:', err.message);
-        return res.status(500).json({ error: 'Failed to reach Groq API.' });
-    }
-});
 
 // --- Fallback: Serve index.html for any unknown route (SPA support) ---
 app.get('*', (req, res) => {

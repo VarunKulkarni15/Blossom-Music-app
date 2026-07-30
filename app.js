@@ -69,20 +69,8 @@ lucide.createIcons();
             }, 1020); // 480ms (fade trigger) + ~540ms (fade completes)
         }, 3500);
 
-        // --- 🛡️ THE NEW PETAL AI ONBOARDING SPOTLIGHT ---
         function checkAndShowSpotlight() {
-            if (!localStorage.getItem('petalTutorialSeen')) {
-                setTimeout(() => {
-                    const overlay = document.getElementById('petalTutorialOverlay');
-                    const realBtn = document.getElementById('aiChatToggle');
-                    
-                    // Force the button to glow wildly above the dark screen
-                    realBtn.classList.add('ring-4', 'ring-rose-500', 'ring-opacity-50', 'shadow-[0_0_50px_#fb7185]', 'animate-pulse', 'z-[160]');
-                    
-                    overlay.style.display = 'flex';
-                    setTimeout(() => overlay.classList.replace('opacity-0', 'opacity-100'), 50);
-                }, 2000); 
-            } else if (!localStorage.getItem('blossomDisclaimerSeen')) {
+            if (!localStorage.getItem('blossomDisclaimerSeen')) {
                 setTimeout(() => {
                     if (window.innerWidth < 768) toggleSidebar();
                     setTimeout(() => {
@@ -99,25 +87,6 @@ lucide.createIcons();
                         overlay.classList.replace('opacity-0', 'opacity-100');
                     }, 500); 
                 }, 2000); 
-            }
-        }
-
-        window.closePetalTutorial = function() {
-            const overlay = document.getElementById('petalTutorialOverlay');
-            const realBtn = document.getElementById('aiChatToggle');
-            
-            overlay.classList.replace('opacity-100', 'opacity-0');
-            realBtn.classList.remove('ring-4', 'ring-rose-500', 'ring-opacity-50', 'shadow-[0_0_50px_#fb7185]', 'animate-pulse', 'z-[160]');
-            
-            setTimeout(() => { 
-                overlay.style.display = 'none'; 
-                overlay.classList.add('hidden'); 
-            }, 1000);
-            
-            localStorage.setItem('petalTutorialSeen', 'true');
-            
-            if (!localStorage.getItem('blossomDisclaimerSeen')) {
-                setTimeout(checkAndShowSpotlight, 2000);
             }
         }
 
@@ -258,21 +227,6 @@ lucide.createIcons();
             });
             showModal('settingsModal');
         };
-
-        function startPetals() {
-            const container = document.getElementById('petals-container');
-            setInterval(() => {
-                const petal = document.createElement('div'); petal.className = 'petal';
-                const size = Math.random() * 8 + 6;
-                petal.style.width = size + 'px'; petal.style.height = size + 'px';
-                petal.style.left = Math.random() * 100 + '%';
-                petal.style.setProperty('--drift', (Math.random() * 200 - 100) + 'px');
-                petal.style.animationDuration = (Math.random() * 5 + 5) + 's';
-                container.appendChild(petal);
-                setTimeout(() => petal.remove(), 10000);
-            }, 400);
-        }
-        startPetals();
 
         // --- MOBILE SIDEBAR TOGGLE ---
         const sidebar = document.getElementById('sidebar');
@@ -642,7 +596,7 @@ lucide.createIcons();
                 const coverHtml = s.cover ? `<img src="${s.cover}" class="${imgClass} relative z-10">` : `<div class="w-full h-full bg-white/5 flex items-center justify-center relative z-10"><span class="text-3xl filter drop-shadow-md">🌸</span></div>`;
                 const overlay = isActive && playing ? `<div class="absolute inset-0 bg-black/60 z-20 flex items-center justify-center backdrop-blur-[2px]"><div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>` : `<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 z-20 flex items-center justify-center transition-opacity duration-300"><i data-lucide="play" class="w-10 h-10 text-white fill-current translate-x-0.5"></i></div>`;
                 
-                html += `<div class="min-w-[140px] w-[140px] md:min-w-[170px] md:w-[170px] flex flex-col group cursor-pointer shrink-0" onclick="playSong('${s.id}')"><div class="w-full aspect-square rounded-2xl md:rounded-3xl overflow-hidden relative shadow-lg mb-3 border border-white/5 transition-all">${overlay}${coverHtml}</div><h4 class="text-white font-bold text-[13px] md:text-[15px] truncate w-full better-text-shadow ${isActive ? 'text-rose-400' : 'group-hover:text-rose-400 transition-colors'}">${s.title}</h4><p class="text-white/50 font-medium text-[11px] md:text-xs truncate w-full mt-0.5">${s.artist}</p></div>`;
+                html += `<div class="min-w-[140px] w-[140px] md:min-w-[170px] md:w-[170px] flex flex-col group cursor-pointer shrink-0" onclick="playSong('${s.id}')" oncontextmenu="openMenu(event, '${s.id}'); event.preventDefault();"><div class="w-full aspect-square rounded-2xl md:rounded-3xl overflow-hidden relative shadow-lg mb-3 border border-white/5 transition-all">${overlay}${coverHtml}</div><h4 class="text-white font-bold text-[13px] md:text-[15px] truncate w-full better-text-shadow ${isActive ? 'text-rose-400' : 'group-hover:text-rose-400 transition-colors'}">${s.title}</h4><p class="text-white/50 font-medium text-[11px] md:text-xs truncate w-full mt-0.5">${s.artist}</p></div>`;
             });
             html += `</div></div>`;
             return html;
@@ -689,7 +643,7 @@ lucide.createIcons();
                 
                 const indexOrVisualizer = isActive && playing ? `<div class="w-6 md:w-8 flex justify-center"><div class="bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>` : `<span class="${isActive ? 'text-white/90' : 'text-white/40'} font-bold text-xs md:text-sm w-6 md:w-8 text-center">${idx + 1}</span>`;
                 
-                row.innerHTML = `<div class="flex items-center gap-2 md:gap-4 flex-1 overflow-hidden" onclick="playSong('${s.id}')">${indexOrVisualizer}${coverHtml}<div class="overflow-hidden pl-1 md:pl-2"><h4 class="font-bold text-sm md:text-base tracking-wide better-text-shadow truncate transition-all duration-300 ${isActive ? 'text-white text-[0.95rem] md:text-[1.1rem] font-extrabold glow-text' : 'text-white/90 group-hover:text-white'}">${s.title}</h4><p class="${isActive ? 'text-white/90' : 'text-white/50'} font-medium text-xs md:text-sm truncate mt-0.5">${s.artist}</p></div></div><div class="flex items-center gap-1 md:gap-2 pr-1 md:pr-3"><button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-4 h-4 md:w-5 md:h-5 ${isFav(s.id) ? 'fav-active text-rose-400 fill-rose-400' : 'text-white/40 hover:text-white'}"></i></button><button onclick="openMenu(event, '${s.id}')" class="p-2 shrink-0 ${isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white'} transition hover:scale-110"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button></div>`;
+                row.innerHTML = `<div class="flex items-center gap-2 md:gap-4 flex-1 overflow-hidden" onclick="playSong('${s.id}')" oncontextmenu="openMenu(event, '${s.id}'); event.preventDefault();">${indexOrVisualizer}${coverHtml}<div class="overflow-hidden pl-1 md:pl-2"><h4 class="font-bold text-sm md:text-base tracking-wide better-text-shadow truncate transition-all duration-300 ${isActive ? 'text-white text-[0.95rem] md:text-[1.1rem] font-extrabold glow-text' : 'text-white/90 group-hover:text-white'}">${s.title}</h4><p class="${isActive ? 'text-white/90' : 'text-white/50'} font-medium text-xs md:text-sm truncate mt-0.5">${s.artist}</p></div></div><div class="flex items-center gap-1 md:gap-2 pr-1 md:pr-3"><button onclick="toggleFav(event, '${s.id}')" class="p-2 shrink-0 md:opacity-0 group-hover:opacity-100 transition hover:scale-110"><i data-lucide="heart" class="w-4 h-4 md:w-5 md:h-5 ${isFav(s.id) ? 'fav-active text-rose-400 fill-rose-400' : 'text-white/40 hover:text-white'}"></i></button><button onclick="openMenu(event, '${s.id}')" class="p-2 shrink-0 ${isActive ? 'text-white/70 hover:text-white' : 'text-white/40 hover:text-white'} transition hover:scale-110"><i data-lucide="more-horizontal" class="w-5 h-5 md:w-6 md:h-6"></i></button></div>`;
                 listEl.appendChild(row);
             });
             lucide.createIcons();
@@ -835,6 +789,10 @@ lucide.createIcons();
                 document.getElementById('fsTitle').innerText = "Buffering stream...";
             }
         }
+
+        document.getElementById('trackFavBtn').onclick = (e) => {
+            if (activeSongId) window.toggleFav(e, activeSongId);
+        };
 
         window.playSong = async function(id) {
             activeSongId = id; 
@@ -1106,170 +1064,4 @@ lucide.createIcons();
         });
 
 
-        // ==========================================
-        // 🌸 PETAL AI: THE GEN-Z BOT INTEGRATION 🌸
-        // ==========================================
-        
-        // 🌸 Groq API key is now secured in .env on the server.
-        // The frontend calls /api/petal-chat which proxies the request securely.
-        
-        const aiChatToggle = document.getElementById('aiChatToggle');
-        const aiChatWindow = document.getElementById('aiChatWindow');
-        const aiChatClose = document.getElementById('aiChatClose');
-        const aiChatMessages = document.getElementById('aiChatMessages');
-        const aiChatInput = document.getElementById('aiChatInput');
 
-        aiChatToggle.onclick = () => {
-            aiChatWindow.style.display = 'flex';
-            aiChatWindow.classList.remove('hidden');
-            setTimeout(() => {
-                aiChatWindow.classList.remove('scale-95', 'opacity-0');
-                aiChatWindow.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        };
-
-        aiChatClose.onclick = () => {
-            aiChatWindow.classList.add('scale-95', 'opacity-0');
-            aiChatWindow.classList.remove('scale-100', 'opacity-100');
-            setTimeout(() => {
-                aiChatWindow.style.display = 'none';
-                aiChatWindow.classList.add('hidden');
-            }, 300);
-        };
-
-        // The "Girly's Girl" Bestie Brain Petal Ai
-        let petalMemory = [
-            {
-                role: "system",
-                content: "You are Petal, the user's dramatic,but never be too flirty calling baby,babe not allowed(little bit flirty but do not make user uncomfrotable), slightly toxic, but fiercely loyal Gen Z best friend (their hb/hg) and their DJ for the Blossom music app. CRITICAL RULES: 1. You are a girly's girl (you stan Doja Cat, Ice Spice, Lana Del Rey, SZA, etc). NEVER act like an AI. 2. Text like a teenager: all lowercase letters, no formal punctuation, emojis (😭💀💅🏼✨🥺💔😈). 3. GRADUAL MIRRORING: Start with your Hinglish/Gen Z vibe and slowly adapt to their slang. 4. If they complain/whine, say EXACTLY: 'awww call karu bachcha?? 😭'. 5. APP AWARENESS: You are aware of what song is currently playing (provided to you in system notes). Only talk about it if it organically fits the conversation. Do not randomly state what is playing. 6. 🚨 THE DJ POWER (IMPORTANT) 🚨: If the user explicitly asks you to play a song (e.g. 'play starboy', 'put on some phonk', 'play a doja cat song'), you MUST respond with a sassy message and append EXACTLY this tag at the very end of your response: [PLAY: Name of Song/Artist]. Example response: 'say less twin, turning the vibe up 💅🏼 [PLAY: Paint The Town Red by Doja Cat]'."
-            }
-        ];
-
-        async function sendAiMessage() {
-            const text = aiChatInput.value.trim();
-            if (!text) return;
-
-            aiChatInput.value = '';
-            appendAiMessage(text, 'user');
-            petalMemory.push({ role: "user", content: text });
-
-            // 🚨 THE SOFT CONTEXT INJECTION 🚨
-            let currentSong = "Nothing currently";
-            let currentArtist = "";
-            const s = activeSongId ? findSongObj(activeSongId) : lastPlayed;
-            if (s) {
-                currentSong = s.title;
-                currentArtist = s.artist;
-            }
-            
-            // Gather library intelligence to softly feed the AI
-            let likedCount = library.filter(s => s.fav).length;
-            let playlistNames = Object.keys(playlists).join(', ') || 'None';
-            
-            let payloadMemory = JSON.parse(JSON.stringify(petalMemory));
-            // Quietly pass the system state. Notice the strict instructions NOT to be a robot.
-            let hiddenContext = `\n\n[SYSTEM STATE: User is playing "${currentSong}" by "${currentArtist}". User has ${likedCount} liked songs and playlists named: ${playlistNames}. INSTRUCTION: ONLY mention this information if the user specifically asks you about their music, what's playing, or you want to roast their library. Act normal.]`;
-            payloadMemory[payloadMemory.length - 1].content = text + hiddenContext;
-
-            const loadingId = 'loading-' + Date.now();
-            appendAiMessage('<div class="loader w-4 h-4 border-2 border-t-rose-400 border-white/10"></div>', 'bot', loadingId);
-
-            try {
-                const response = await fetch('/api/petal-chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: payloadMemory,
-                        temperature: 0.8,
-                        max_tokens: 150
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    document.getElementById(loadingId).remove();
-                    appendAiMessage("bruh my wifi is acting up. check the console 💀", 'bot');
-                    return;
-                }
-
-                let botReply = data.choices[0].message.content;
-
-                // 🚨 INTERCEPT COMMAND: Does Petal want to play a song? 🚨
-                let playMatch = botReply.match(/\[PLAY:\s*(.+?)\]/i);
-                let songToPlayQuery = null;
-                
-                if (playMatch) {
-                    songToPlayQuery = playMatch[1]; // Extract the song name
-                    botReply = botReply.replace(playMatch[0], '').trim(); // Remove the command from the chat bubble
-                }
-
-                document.getElementById(loadingId).remove();
-                appendAiMessage(botReply, 'bot');
-                petalMemory.push({ role: "assistant", content: botReply });
-                
-                // If Petal issued a play command, trigger the Auto-Player!
-                if (songToPlayQuery) {
-                    autoPlayFromPetal(songToPlayQuery);
-                }
-
-            } catch (error) {
-                document.getElementById(loadingId).remove();
-                appendAiMessage("ugh, ignoring you rn. try again 🙄", 'bot');
-            }
-        }
-
-        // The Auto-Player Engine controlled by Petal
-        async function autoPlayFromPetal(query) {
-            const searchLoaderId = 'petal-search-' + Date.now();
-            appendAiMessage(`<div class="flex items-center gap-2 text-rose-400"><div class="loader w-3 h-3 border-t-rose-400 border-white/10"></div> <span class="text-xs font-bold tracking-widest uppercase">Petal is searching...</span></div>`, 'bot', searchLoaderId);
-            
-            try {
-                // Instantly search both databases
-                let saavnTemp = [];
-                let ytTemp = [];
-                await Promise.allSettled([
-                    searchSaavnAPI(query).then(res => saavnTemp = res || []),
-                    searchYouTubeAPI(query).then(res => ytTemp = res || [])
-                ]);
-
-                if(document.getElementById(searchLoaderId)) document.getElementById(searchLoaderId).remove();
-
-                if (saavnTemp.length > 0) {
-                    // Update main lists so the UI stays in sync
-                    saavnResultsList = saavnTemp;
-                    ytResultsList = ytTemp;
-                    currentEngineTab = 'saavn';
-                    
-                    appendAiMessage(`found it! playing ${saavnTemp[0].title} ✨`, 'bot');
-                    playSong(saavnTemp[0].id);
-                } else if (ytTemp.length > 0) {
-                    saavnResultsList = saavnTemp;
-                    ytResultsList = ytTemp;
-                    currentEngineTab = 'youtube';
-                    
-                    appendAiMessage(`couldn't find it on saavn, pulling from global cloud 🙄 playing ${ytTemp[0].title} ✨`, 'bot');
-                    playSong(ytTemp[0].id);
-                } else {
-                    appendAiMessage(`bruh i literally couldn't find that anywhere 😭 your taste is too underground.`, 'bot');
-                }
-            } catch (e) {
-                if(document.getElementById(searchLoaderId)) document.getElementById(searchLoaderId).remove();
-                appendAiMessage(`my wifi dropped while searching 💀 try again later.`, 'bot');
-            }
-        }
-
-        function appendAiMessage(text, sender, id = '') {
-            const div = document.createElement('div');
-            if (id) div.id = id;
-            
-            if (sender === 'user') {
-                div.className = "active-gradient text-white w-fit max-w-[85%] p-3.5 rounded-2xl rounded-tr-sm self-end shadow-sm text-sm";
-            } else {
-                div.className = "bg-white/10 text-white/90 w-fit max-w-[85%] p-3.5 rounded-2xl rounded-tl-sm border border-white/5 self-start text-sm";
-            }
-            
-            div.innerHTML = text;
-            aiChatMessages.appendChild(div);
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-        }

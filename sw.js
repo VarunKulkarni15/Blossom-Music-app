@@ -1,10 +1,13 @@
-const CACHE_NAME = 'blossom-app-cache-v1';
+const CACHE_NAME = 'blossom-app-cache-v2';
 const urlsToCache = [
     '/',
     '/index.html',
     '/styles.css',
     '/app.js',
-    '/icon.ico'
+    '/icon.ico',
+    'https://cdn.tailwindcss.com',
+    'https://unpkg.com/lucide@latest',
+    'https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js'
 ];
 
 self.addEventListener('install', event => {
@@ -25,10 +28,20 @@ self.addEventListener('fetch', event => {
 
     event.respondWith(
         caches.match(event.request)
-            .then(response => {
-                // Return cache if found, else fetch from network
-                return response || fetch(event.request).catch(() => {
-                    // Fallback for offline mode if the resource isn't cached
+            .then(cachedResponse => {
+                if (cachedResponse) return cachedResponse;
+                
+                return fetch(event.request).then(networkResponse => {
+                    // Dynamically cache external fonts/scripts if they succeed
+                    if (networkResponse && networkResponse.status === 200 && event.request.url.startsWith('http')) {
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    }
+                    return networkResponse;
+                }).catch(() => {
+                    // Offline fallback if fetch fails and not in cache
                 });
             })
     );

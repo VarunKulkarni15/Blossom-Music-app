@@ -364,10 +364,6 @@
         .bar:nth-child(3) { animation-delay: 0.3s; }
         @keyframes bounce { 0% { height: 4px; } 100% { height: 16px; } }
         
-        /* Petal Intro Draw Animation */
-        @keyframes drawArrow {
-            to { stroke-dashoffset: 0; }
-        }
 
         /* Splash Screen Cinematic Animations */
         #splashScreen { transition: opacity 0.5s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.5s; z-index: 200; overflow: hidden; }
