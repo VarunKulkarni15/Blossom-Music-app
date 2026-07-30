@@ -7,12 +7,30 @@ const ffmpegPath = require('ffmpeg-static');
 ffmpeg.setFfmpegPath(ffmpegPath);
 const NodeID3 = require('node-id3');
 const archiver = require('archiver');
-const pLimit = require('p-limit');
+const os = require('os');
 const saavn = require('saavnapi').default;
 
-const CACHE_DIR = path.join(__dirname, 'downloads_cache');
+const CACHE_DIR = path.join(os.tmpdir(), 'blossom_downloads_cache');
 if (!fs.existsSync(CACHE_DIR)) {
-    fs.mkdirSync(CACHE_DIR);
+    fs.mkdirSync(CACHE_DIR, { recursive: true });
+}
+
+function pLimit(concurrency) {
+    const queue = [];
+    let activeCount = 0;
+    const next = () => {
+        activeCount--;
+        if (queue.length > 0) queue.shift()();
+    };
+    return (fn) => new Promise((resolve, reject) => {
+        const run = async () => {
+            activeCount++;
+            try { resolve(await fn()); } catch (err) { reject(err); }
+            next();
+        };
+        if (activeCount < concurrency) run();
+        else queue.push(run);
+    });
 }
 
 // Function to download, convert, tag and cache a song
@@ -42,6 +60,7 @@ async function getCachedOrDownloadSong(song) {
             if (song.source === 'youtube') {
                 const url = `https://www.youtube.com/watch?v=${song.id}`;
                 stream = ytdl(url, { filter: 'audioonly', quality: 'highestaudio' });
+                stream.on('error', (err) => reject(err));
             } else {
                 // Fetch fresh high quality Saavn URL
                 const details = await saavn.songs.getSongDetails(song.id);
@@ -53,6 +72,7 @@ async function getCachedOrDownloadSong(song) {
                 
                 const sRes = await fetch(actualUrl);
                 stream = sRes.body;
+                stream.on('error', (err) => reject(err));
             }
 
             ffmpeg(stream)
@@ -111,7 +131,10 @@ module.exports = function(app) {
         
         try {
             const archive = archiver('zip', { zlib: { level: 9 } });
-            archive.on('error', (err) => { throw err; });
+            archive.on('error', (err) => { 
+                console.error('Archiver error:', err); 
+                if (!res.headersSent) res.status(500).json({ error: 'Archive failed' });
+            });
             
             // Set headers for zip streaming
             res.setHeader('Content-Type', 'application/zip');

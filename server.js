@@ -19,7 +19,6 @@ const ffmpegPath = require('ffmpeg-static');
 ffmpeg.setFfmpegPath(ffmpegPath);
 const NodeID3 = require('node-id3');
 const archiver = require('archiver');
-const pLimit = require('p-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
