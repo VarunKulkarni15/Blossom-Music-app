@@ -63,14 +63,23 @@ async function getCachedOrDownloadSong(song) {
                 stream.on('error', (err) => reject(err));
             } else {
                 // Fetch fresh high quality Saavn URL
-                const details = await saavn.songs.getSongDetails(song.id);
                 let actualUrl = null;
-                if (details && details.downloadUrl) {
-                    actualUrl = details.downloadUrl.find(u => u.quality === '320kbps')?.url || details.downloadUrl[0]?.url;
+                try {
+                    const detailsRes = await saavn.songs.getSongByIds({ songIds: [song.id] });
+                    const details = Array.isArray(detailsRes) ? detailsRes[0] : detailsRes;
+                    if (details && details.downloadUrl) {
+                        actualUrl = details.downloadUrl.find(u => u.quality === '320kbps')?.url || details.downloadUrl[0]?.url;
+                    }
+                } catch(e) {
+                    console.error("Saavn API failed:", e);
                 }
+                
+                if (!actualUrl) actualUrl = song.url;
                 if (!actualUrl) throw new Error("No URL found for Saavn song");
                 
                 const sRes = await fetch(actualUrl);
+                if (!sRes.ok) throw new Error(`Saavn stream returned ${sRes.status} for ${song.title}`);
+                
                 stream = sRes.body;
                 stream.on('error', (err) => reject(err));
             }
